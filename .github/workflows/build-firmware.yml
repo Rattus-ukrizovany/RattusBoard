@@ -92,4 +92,73 @@ jobs:
         if-no-files-found: warn
         retention-days: 30
 
+  release-firmware:
+    needs: build-firmware
+    runs-on: ubuntu-latest
+    # Only run on push to main branch, not on pull requests
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Download firmware artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: rattusboard-firmware
+        path: firmware-artifacts/
+        
+    - name: List downloaded artifacts
+      run: |
+        echo "Downloaded firmware artifacts:"
+        find firmware-artifacts/ -type f | head -10
+        ls -la firmware-artifacts/
+        
+    - name: Check for UF2 firmware file
+      id: check_firmware
+      run: |
+        if [ -f "firmware-artifacts/rattusboard_default.uf2" ]; then
+          echo "firmware_found=true" >> $GITHUB_OUTPUT
+          echo "Found firmware file: rattusboard_default.uf2"
+        else
+          echo "firmware_found=false" >> $GITHUB_OUTPUT
+          echo "No UF2 firmware file found - compilation likely failed"
+        fi
+        
+    - name: Create Release and Upload Asset
+      if: steps.check_firmware.outputs.firmware_found == 'true'
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: build-${{ github.sha }}
+        name: "RattusBoard Firmware Build ${{ github.sha }}"
+        body: |
+          ## RattusBoard Firmware Release
+          
+          Automatically generated firmware build from commit [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }}).
+          
+          ### Installation Instructions
+          1. Download `rattusboard_default.uf2` from the assets below
+          2. Hold BOOTSEL and plug in USB on each Pico to enter bootloader mode
+          3. Drag `rattusboard_default.uf2` onto the RPI-RP2 drive for both halves
+          4. Connect halves with TRRS cable and plug USB into left half
+          
+          ### Features
+          - Split keyboard support with auto hand detection
+          - PMW3360 trackball integration (right half)
+          - Rotary encoder support (right half)
+          - VIA/Vial configuration support
+          - Full QMK feature set
+          
+          For detailed setup instructions, see the [README](https://github.com/${{ github.repository }}#-firmware-flashing--split-setup-important-clarification).
+        files: firmware-artifacts/rattusboard_default.uf2
+        make_latest: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Log release skipped
+      if: steps.check_firmware.outputs.firmware_found != 'true'
+      run: |
+        echo "Release creation skipped - no firmware file available"
+        echo "This is likely due to compilation failure in the build job"
+
       
