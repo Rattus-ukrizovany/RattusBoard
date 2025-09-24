@@ -9,12 +9,14 @@
 /*
  * Custom matrix implementation for RattusBoard
  * 
- * This implements independent 3x7 matrix scanning for each split half.
- * The matrix is organized as:
- * - 3 columns per half (fully independent)
- * - 7 rows per half (fully independent) 
- * - Diodes are COL2ROW
- * - Each half only scans its own pins
+ * Physical Design: FULLY INDEPENDENT halves
+ * - Left half: Rows GP2-GP8, Cols GP9-GP11 (physically independent)
+ * - Right half: Rows GP2-GP8, Cols GP12-GP14 (physically independent)
+ * 
+ * QMK Implementation: Standard 6x7 split matrix
+ * - Left half scans columns 3-5 (physically GP9-GP11)
+ * - Right half scans columns 0-2 (physically GP12-GP14)
+ * - Rows are logically shared but physically independent
  */
 
 #ifndef DEBOUNCE
@@ -62,16 +64,28 @@ void matrix_init_custom(void) {
 bool matrix_scan_custom(matrix_row_t current_matrix[]) {
     bool changed = false;
     
-    // Each half only scans its own 3 columns
-    // No column offset needed - each half is fully independent
-    for (uint8_t col = 0; col < MATRIX_COLS; col++) {
-        // Select column
+    // Determine which columns to scan based on split half
+    // Physical wiring is independent but QMK expects this logical arrangement
+    uint8_t col_start, col_end;
+    if (isLeftHand) {
+        // Left half physically uses GP9-GP11, maps to logical columns 3-5
+        col_start = 3;
+        col_end = 6;
+    } else {
+        // Right half physically uses GP12-GP14, maps to logical columns 0-2  
+        col_start = 0;
+        col_end = 3;
+    }
+    
+    // Scan the matrix (each half scans only its own physical pins)
+    for (uint8_t col = col_start; col < col_end; col++) {
+        // Select column (this will only activate pins present on this half)
         writePinLow(col_pins[col]);
         
         // Small delay for signal to propagate
         matrix_io_delay();
         
-        // Read all rows for this column
+        // Read all rows for this column (each half reads its own pins)
         for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
             bool key_pressed = !readPin(row_pins[row]);
             

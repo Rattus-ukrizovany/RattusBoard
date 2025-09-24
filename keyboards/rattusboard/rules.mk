@@ -42,3 +42,4 @@ OPT_DEFS += -DSPI_SELECT_MODE=SPI_SELECT_MODE_PAD
 
 # Custom source files
 SRC += matrix.c
+CUSTOM_MATRIX = lite

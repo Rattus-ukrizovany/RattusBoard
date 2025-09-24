@@ -3,9 +3,9 @@
 
 #pragma once
 
-/* key matrix size - each half is independent */
+/* key matrix size - QMK standard split format */
 #define MATRIX_ROWS 7
-#define MATRIX_COLS 3
+#define MATRIX_COLS 6  // QMK expects 6 cols for a 3x3 split
 
 /* 
  * Keyboard Matrix Assignments (Raspberry Pi Pico / RP2040)
@@ -22,7 +22,7 @@
  * - Cols: GP12, GP13, GP14
  */
 #define MATRIX_ROW_PINS { GP2, GP3, GP4, GP5, GP6, GP7, GP8 }
-#define MATRIX_COL_PINS { GP9, GP10, GP11 }
+#define MATRIX_COL_PINS { GP12, GP13, GP14, GP9, GP10, GP11 }
 
 /* COL2ROW, ROW2COL */
 #define DIODE_DIRECTION COL2ROW
@@ -42,10 +42,8 @@
  * PMW3360 Trackball Configuration
  * Using SPI interface on RP2040
  */
-#define POINTING_DEVICE_ENABLE
-#define POINTING_DEVICE_DRIVER pmw3360
-#define PMW3360_CS_PIN GP17
-#define PMW3360_CPI 1600
+#define PMW33XX_CS_PIN GP17
+#define PMW33XX_CPI 1600
 
 /* SPI Configuration for PMW3360 */
 #define SPI_DRIVER SPID0
@@ -57,12 +55,7 @@
  * Rotary Encoder Configuration (Mouse Wheel)
  * Connected to right half for scroll wheel functionality
  */
-#define ENCODERS_PAD_A { GP21 }
-#define ENCODERS_PAD_B { GP22 }
-#define ENCODER_RESOLUTION 4
-
-/* Enable encoder mapping */
-#define ENCODER_MAP_ENABLE
+// Note: ENCODERS_PAD_A and ENCODERS_PAD_B defined in keyboard.json
 
 /*
  * Feature flags
