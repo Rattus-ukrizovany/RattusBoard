@@ -74,7 +74,7 @@ RattusBoard is a cutting-edge split ergonomic keyboard designed for productivity
 
 ### 🔌 Wiring Guide
 
-> **📖 [Complete Detailed Wiring Instructions → HALVES_WIRING.md](HALVES_WIRING.md)**
+
 
 This section provides essential wiring information for the RattusBoard split keyboard. For comprehensive assembly instructions, troubleshooting, and detailed diagrams, see the **[detailed wiring guide](HALVES_WIRING.md)**.
 
@@ -299,6 +299,49 @@ qmk flash -kb rattusboard -km default
 #### Bootloader Mode
 - **Initial Flash**: Hold BOOTSEL button while connecting USB
 - **Subsequent Flashes**: Use reset button or `QK_BOOT` key in keymap
+
+### 🔧 Split Keyboard Configuration
+
+The QMK firmware for RattusBoard is fully configured for split keyboard operation:
+
+#### Firmware Compatibility ✅
+- **Split Detection**: Hardware-based using GP16 pin (automatic hand detection)
+- **Communication**: Serial communication via GP1 pin over TRRS cable
+- **Power Management**: Master (left) powers slave (right) via TRRS Ring 2
+- **Matrix Configuration**: Proper column offsets for split operation
+- **Peripheral Support**: PMW3360 trackball and encoder on right half only
+
+#### Key Configuration Parameters
+```c
+// Split keyboard settings (from config.h)
+#define SPLIT_HAND_PIN GP16              // Hardware hand detection
+#define SPLIT_HAND_PIN_LOW_IS_LEFT       // GP16→GND = left half
+#define SOFT_SERIAL_PIN GP1              // TRRS serial communication
+#define SPLIT_USB_DETECT                 // USB detection for master
+#define SPLIT_KEYBOARD                   // Enable split functionality
+```
+
+#### No Additional Configuration Needed
+The firmware works out-of-the-box with the split wiring described in [WIRING_GUIDE.md](WIRING_GUIDE.md). The same firmware binary is flashed to both halves - hardware pin configuration (GP16) automatically determines which half is which.
+
+#### Firmware Implementation Details
+- **Automatic Hand Detection**: The firmware reads GP16 at startup to determine left vs right half
+- **Matrix Scanning**: Left half scans columns 0-2 (GP9-GP11), right half scans columns 3-5 (GP12-GP14)
+- **Serial Communication**: Both halves use GP1 for UART communication over TRRS cable
+- **Power Management**: Left half supplies 3.3V to right half via TRRS Ring 2
+- **Peripheral Handling**: PMW3360 and encoder are only active on the right half
+
+#### Validation
+Run these commands to verify your configuration:
+```bash
+# Copy keyboard files to QMK directory
+cp -r keyboards/rattusboard ~/.local/share/qmk/keyboards/
+
+# Validate configuration (warnings about deprecated options are normal)
+qmk compile -kb rattusboard -km default --dry-run
+
+# The firmware should compile successfully despite deprecation warnings
+```
 
 ---
 

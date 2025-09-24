@@ -27,20 +27,11 @@
         "enabled": true,
         "soft_serial_pin": "GP1",
         "handedness": {
-            "pin": "GP16",
-            "low": "right"
+
         },
         "matrix_pins": {
             "right": {
-                "direct": [
-                    ["GP12", "GP13", "GP14"],
-                    ["GP12", "GP13", "GP14"],
-                    ["GP12", "GP13", "GP14"],
-                    ["GP12", "GP13", "GP14"],
-                    ["GP12", "GP13", "GP14"],
-                    ["GP12", "GP13", "GP14"],
-                    ["GP12", "GP13", "GP14"]
-                ]
+                "cols": ["GP12", "GP13", "GP14"]
             }
         }
     },
