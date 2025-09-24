@@ -3,13 +3,6 @@
 
 #pragma once
 
-/* USB Device descriptor parameter */
-#define VENDOR_ID    0x5242  // "RB" in hex
-#define PRODUCT_ID   0x0001
-#define DEVICE_VER   0x0001
-#define MANUFACTURER "RattusBoard"
-#define PRODUCT      "RattusBoard"
-
 /* key matrix size */
 #define MATRIX_ROWS 7
 #define MATRIX_COLS 6
@@ -72,23 +65,12 @@
 #define ENCODER_MAP_ENABLE
 
 /*
- * VIAL Configuration
- */
-#define VIAL_KEYBOARD_UID {0x5B, 0x4A, 0x8F, 0x2E, 0x1C, 0x9D, 0x6A, 0x7F}
-#define VIAL_UNLOCK_COMBO_ROWS { 0, 0 }
-#define VIAL_UNLOCK_COMBO_COLS { 0, 1 }
-
-/*
  * Feature flags
  */
 #define SPLIT_LAYER_STATE_ENABLE
 #define SPLIT_LED_STATE_ENABLE
 #define SPLIT_MODS_ENABLE
 #define SPLIT_OLED_ENABLE
-
-/* Disable unused features to save space */
-#define NO_ACTION_MACRO
-#define NO_ACTION_FUNCTION
 
 /*
  * RP2040 specific settings
@@ -100,7 +82,6 @@
 /* 
  * Advanced features
  */
-#define TAPPING_FORCE_HOLD
 #define TAPPING_TERM 200
 #define PERMISSIVE_HOLD
 

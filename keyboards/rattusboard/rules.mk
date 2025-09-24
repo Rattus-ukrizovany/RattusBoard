@@ -26,9 +26,8 @@ POINTING_DEVICE_DRIVER = pmw3360
 ENCODER_ENABLE = yes
 ENCODER_MAP_ENABLE = yes
 
-# VIAL support
+# VIA support (VIAL is handled via keyboard.json now)
 VIA_ENABLE = yes
-VIAL_ENABLE = yes
 
 # Optional features (can be enabled as needed)
 LTO_ENABLE = yes            # Link Time Optimization for smaller firmware

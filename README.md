@@ -74,7 +74,38 @@ RattusBoard is a cutting-edge split ergonomic keyboard designed for productivity
 
 ### 🔌 Wiring Guide
 
-This section provides detailed pin assignments for the Raspberry Pi Pico (RP2040) microcontroller. **All pin assignments must match exactly between both halves for proper operation.**
+For comprehensive wiring instructions with detailed pin assignments for both left (master) and right (slave) halves, see the **[Complete Split Wiring Guide](WIRING_GUIDE.md)**.
+
+#### 🗺️ Wiring Diagram Overview
+
+```
+LEFT HALF (Master)                           RIGHT HALF (Slave)
+┌─────────────────────┐    TRRS Cable       ┌─────────────────────┐
+│  Raspberry Pi Pico  │◄──────────────────►│  Raspberry Pi Pico  │
+│                     │                     │                     │
+│ GP1  ─── TRRS Tip   │◄──── Serial ──────►│   TRRS Tip ─── GP1  │
+│ GND  ─── Ring 1     │◄──── Ground ──────►│   Ring 1   ─── GND  │
+│ 3.3V ─── Ring 2     │◄──── Power  ──────►│   Ring 2   ─── 3.3V │
+│                     │                     │                     │
+│ GP16 ─── GND (ID)   │                     │   GP16 ─── Float    │
+│                     │                     │                     │
+│ Matrix: GP2-GP8     │                     │ Matrix: GP2-GP8     │
+│         GP9-GP11    │                     │         GP12-GP14   │
+│                     │                     │                     │
+│ USB-C ── Host       │                     │ 🖱️ PMW3360: GP17-20 │
+│                     │                     │ 🎛️ Encoder: GP21-22 │
+└─────────────────────┘                     └─────────────────────┘
+```
+
+**Key Points:**
+- Left half connects to USB host and powers right half via TRRS
+- Hand detection: GP16→GND (left), GP16→Float (right)  
+- Trackball (PMW3360) and encoder only on right half
+- Both halves share matrix row pins (GP2-GP8)
+
+#### Quick Reference Summary
+
+This section provides essential pin assignments for quick reference. **For complete wiring details, troubleshooting, and assembly tips, please refer to [WIRING_GUIDE.md](WIRING_GUIDE.md).**
 
 #### Matrix Wiring (6x7 Corne-style Layout)
 
@@ -366,6 +397,49 @@ qmk flash -kb rattusboard -km default
 #### Bootloader Mode
 - **Initial Flash**: Hold BOOTSEL button while connecting USB
 - **Subsequent Flashes**: Use reset button or `QK_BOOT` key in keymap
+
+### 🔧 Split Keyboard Configuration
+
+The QMK firmware for RattusBoard is fully configured for split keyboard operation:
+
+#### Firmware Compatibility ✅
+- **Split Detection**: Hardware-based using GP16 pin (automatic hand detection)
+- **Communication**: Serial communication via GP1 pin over TRRS cable
+- **Power Management**: Master (left) powers slave (right) via TRRS Ring 2
+- **Matrix Configuration**: Proper column offsets for split operation
+- **Peripheral Support**: PMW3360 trackball and encoder on right half only
+
+#### Key Configuration Parameters
+```c
+// Split keyboard settings (from config.h)
+#define SPLIT_HAND_PIN GP16              // Hardware hand detection
+#define SPLIT_HAND_PIN_LOW_IS_LEFT       // GP16→GND = left half
+#define SOFT_SERIAL_PIN GP1              // TRRS serial communication
+#define SPLIT_USB_DETECT                 // USB detection for master
+#define SPLIT_KEYBOARD                   // Enable split functionality
+```
+
+#### No Additional Configuration Needed
+The firmware works out-of-the-box with the split wiring described in [WIRING_GUIDE.md](WIRING_GUIDE.md). The same firmware binary is flashed to both halves - hardware pin configuration (GP16) automatically determines which half is which.
+
+#### Firmware Implementation Details
+- **Automatic Hand Detection**: The firmware reads GP16 at startup to determine left vs right half
+- **Matrix Scanning**: Left half scans columns 0-2 (GP9-GP11), right half scans columns 3-5 (GP12-GP14)
+- **Serial Communication**: Both halves use GP1 for UART communication over TRRS cable
+- **Power Management**: Left half supplies 3.3V to right half via TRRS Ring 2
+- **Peripheral Handling**: PMW3360 and encoder are only active on the right half
+
+#### Validation
+Run these commands to verify your configuration:
+```bash
+# Copy keyboard files to QMK directory
+cp -r keyboards/rattusboard ~/.local/share/qmk/keyboards/
+
+# Validate configuration (warnings about deprecated options are normal)
+qmk compile -kb rattusboard -km default --dry-run
+
+# The firmware should compile successfully despite deprecation warnings
+```
 
 ---
 
