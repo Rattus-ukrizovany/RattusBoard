@@ -501,15 +501,6 @@ Special thanks to:
 
 ---
 
-## 📞 Contact & Support
-
-- **Issues**: [GitHub Issues](../../issues)
-- **Discussions**: [GitHub Discussions](../../discussions)
-- **Email**: [Contact Information]
-- **Social**: [Social Media Links]
-
----
-
 <div align="center">
 
 **Made with ❤️ by the keyboard community**
