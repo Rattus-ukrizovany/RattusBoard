@@ -91,3 +91,31 @@ jobs:
         path: firmware-output/*
         if-no-files-found: warn
         retention-days: 30
+
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: firmware
+          path: ./artifacts
+
+      - name: Set up GitHub CLI
+        uses: cli/gh-action@v2
+
+      - name: Create or update GitHub Release and upload firmware
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="auto-latest"
+          RELEASE_NAME="Automated Firmware Release"
+          UF2_FILE=$(find ./artifacts -name '*.uf2' | head -n 1)
+          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" || \
+            gh release create "$TAG" "$UF2_FILE" --repo "$GITHUB_REPOSITORY" --title "$RELEASE_NAME" --notes "Automated build from $GITHUB_SHA"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY"; then
+            gh release upload "$TAG" "$UF2_FILE" --repo "$GITHUB_REPOSITORY" --clobber
+          fi
