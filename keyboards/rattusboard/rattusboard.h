@@ -26,7 +26,7 @@
  * └─────┴─────┼─────┤          ├─────┼─────┴─────┘
  *             │ L60 │ L61 │ L62 │ R60 │ R61 │ R62 │    Row 6 (thumbs)
  *             └─────┴─────┴─────┴─────┴─────┴─────┘
- *                  Trackball        Encoder
+ *                                   Trackball  Encoder
  */
 
 #define LAYOUT_split_3x6_3( \

@@ -64,11 +64,11 @@ bool matrix_scan_custom(matrix_row_t current_matrix[]) {
     // Determine which columns to scan based on split half
     uint8_t col_start, col_end;
     if (isLeftHand) {
-        col_start = 0;
-        col_end = MATRIX_COLS / 2;  // Scan columns 0-2 for left half
-    } else {
         col_start = MATRIX_COLS / 2;
-        col_end = MATRIX_COLS;      // Scan columns 3-5 for right half
+        col_end = MATRIX_COLS;      // Scan columns 3-5 for left half (slave)
+    } else {
+        col_start = 0;
+        col_end = MATRIX_COLS / 2;  // Scan columns 0-2 for right half (master)
     }
     
     // Scan the matrix
