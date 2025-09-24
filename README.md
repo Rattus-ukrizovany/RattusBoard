@@ -74,146 +74,48 @@ RattusBoard is a cutting-edge split ergonomic keyboard designed for productivity
 
 ### 🔌 Wiring Guide
 
-For comprehensive wiring instructions with detailed pin assignments for both left (master) and right (slave) halves, see the **[Complete Split Wiring Guide](WIRING_GUIDE.md)**.
 
-#### 🗺️ Wiring Diagram Overview
+
+This section provides essential wiring information for the RattusBoard split keyboard. For comprehensive assembly instructions, troubleshooting, and detailed diagrams, see the **[detailed wiring guide](HALVES_WIRING.md)**.
+
 
 ```
-LEFT HALF (Master)                           RIGHT HALF (Slave)
-┌─────────────────────┐    TRRS Cable       ┌─────────────────────┐
-│  Raspberry Pi Pico  │◄──────────────────►│  Raspberry Pi Pico  │
-│                     │                     │                     │
-│ GP1  ─── TRRS Tip   │◄──── Serial ──────►│   TRRS Tip ─── GP1  │
-│ GND  ─── Ring 1     │◄──── Ground ──────►│   Ring 1   ─── GND  │
-│ 3.3V ─── Ring 2     │◄──── Power  ──────►│   Ring 2   ─── 3.3V │
-│                     │                     │                     │
-│ GP16 ─── GND (ID)   │                     │   GP16 ─── Float    │
-│                     │                     │                     │
-│ Matrix: GP2-GP8     │                     │ Matrix: GP2-GP8     │
-│         GP9-GP11    │                     │         GP12-GP14   │
-│                     │                     │                     │
-│ USB-C ── Host       │                     │ 🖱️ PMW3360: GP17-20 │
-│                     │                     │ 🎛️ Encoder: GP21-22 │
-└─────────────────────┘                     └─────────────────────┘
+Left Half (Master)              Right Half (Slave)
+┌─────────────────┐            ┌─────────────────┐
+│  [USB-C INPUT]  │            │                 │
+│ Raspberry Pi    │◄── TRRS ──►│ Raspberry Pi    │
+│ Pico            │            │ Pico            │
+│                 │            │                 │
+│ Matrix: 3×7     │            │ Matrix: 3×7     │
+│ GP16 → GND      │            │ GP16 (floating) │
+└─────────────────┘            │ [PMW3360]       │
+                               │ [Encoder]       │
+                               └─────────────────┘
 ```
 
-**Key Points:**
-- Left half connects to USB host and powers right half via TRRS
-- Hand detection: GP16→GND (left), GP16→Float (right)  
-- Trackball (PMW3360) and encoder only on right half
-- Both halves share matrix row pins (GP2-GP8)
+#### 📋 Essential Pin Assignments
 
-#### Quick Reference Summary
+| Component | Left Half | Right Half | Notes |
+|-----------|-----------|------------|-------|
+| **Matrix Rows** | GP2-GP8 | GP2-GP8 | Shared across both halves |
+| **Matrix Cols** | GP9-GP11 | GP12-GP14 | 3 columns per half |
+| **Split Comm** | GP1 | GP1 | TRRS serial connection |
+| **Hand Detection** | GP16→GND | GP16 (float) | **Critical configuration** |
+| **USB Power** | Native | - | Left half only |
+| **Trackball SPI** | - | GP17-GP20 | Right half only |
+| **Encoder** | - | GP21-GP22 | Right half only |
 
-This section provides essential pin assignments for quick reference. **For complete wiring details, troubleshooting, and assembly tips, please refer to [WIRING_GUIDE.md](WIRING_GUIDE.md).**
 
-#### Matrix Wiring (6x7 Corne-style Layout)
+#### 🔧 Quick Assembly Steps
 
-**Row Connections (Shared between both halves):**
-```
-Row 0: GP2  → Connect to all switches in row 0
-Row 1: GP3  → Connect to all switches in row 1  
-Row 2: GP4  → Connect to all switches in row 2
-Row 3: GP5  → Connect to all switches in row 3
-Row 4: GP6  → Connect to all switches in row 4
-Row 5: GP7  → Connect to all switches in row 5
-Row 6: GP8  → Connect to all switches in row 6 (thumb cluster)
-```
+1. **Install diodes** with correct polarity (band toward row)
+2. **Wire matrix** according to pin assignments above  
+3. **Configure hand detection** (GP16→GND on left only)
+4. **Install TRRS jacks** and verify cable connectivity
+5. **Add peripherals** (trackball, encoder on right half)
+6. **Test thoroughly** before final assembly
 
-**Column Connections:**
-
-*Left Half (Slave):*
-```
-Col 0: GP9  → Connect to all switches in column 0 (left half)
-Col 1: GP10 → Connect to all switches in column 1 (left half)
-Col 2: GP11 → Connect to all switches in column 2 (left half)
-```
-
-*Right Half (Master):*
-```
-Col 3: GP12 → Connect to all switches in column 0 (right half)
-Col 4: GP13 → Connect to all switches in column 1 (right half)
-Col 5: GP14 → Connect to all switches in column 2 (right half)
-```
-
-**Diode Orientation:** COL2ROW (Cathode toward row, Anode toward column)
-
-#### Split Communication
-
-**TRRS Connection (both halves):**
-```
-GP1  → TRRS Tip (Serial communication)
-GND  → TRRS Ring 1 (Ground)
-VCC  → TRRS Ring 2 (Power)
-NC   → TRRS Sleeve (Not connected)
-```
-
-**Split Detection:**
-```
-GP16 → Split hand detection pin
-      → Connect to GND on RIGHT half only
-      → Leave floating on LEFT half
-```
-
-#### PMW3360 Trackball Sensor (Right Half Only)
-
-**SPI Connection:**
-```
-GP17 → CS (Chip Select)
-GP18 → SCK (Serial Clock)
-GP19 → MOSI (Master Out Slave In)  
-GP20 → MISO (Master In Slave Out)
-3.3V → VCC (Power)
-GND  → GND (Ground)
-```
-
-**Additional PMW3360 Connections:**
-```
-Motion pin: Can be connected to GP23 for motion detection (optional)
-Reset pin: Connect to 3.3V through 10kΩ resistor
-```
-
-#### Rotary Encoder (Right Half Only)
-
-**Encoder Connections:**
-```
-GP21 → Encoder Pin A
-GP22 → Encoder Pin B  
-GND  → Encoder Common/Ground
-```
-
-**Encoder Switch (if present):**
-```
-GP24 → Encoder switch pin (optional)
-GND  → Encoder switch ground
-```
-
-#### Power and USB
-
-**USB Connection (Right Half Only):**
-```
-USB-C connector wired to Pico's native USB pins
-GP25 → Status LED (optional)
-```
-
-**Power Distribution:**
-- 3.3V and GND must be shared between halves via TRRS cable
-- Both Picos powered from right half (master)
-
-#### Important Wiring Notes
-
-⚠️ **Critical Requirements:**
-- All GND connections must be solid and continuous
-- Use twisted pair or shielded cable for TRRS connection
-- Keep high-speed signals (SPI) away from matrix wiring
-- Test continuity of all connections before powering up
-
-🔧 **Wiring Tips:**
-- Use different colored wires for rows vs columns
-- Label all connections during assembly
-- Take photos before closing the case
-- Use flux for all solder joints
-- Test each half independently before connecting
+**For complete step-by-step instructions, wiring diagrams, troubleshooting, and testing procedures, refer to [HALVES_WIRING.md](HALVES_WIRING.md).**
 
 ### 🧪 Testing the Firmware
 
