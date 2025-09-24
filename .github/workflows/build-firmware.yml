@@ -140,8 +140,8 @@ jobs:
           fi
           
           # Create simple release notes
-          SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
-          BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})
+          SHORT_SHA=${GITHUB_SHA:0:7}
+          BRANCH_NAME=$GITHUB_REF_NAME
           BUILD_DATE=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
           
           RELEASE_NOTES="Automated firmware build from commit $SHORT_SHA on branch $BRANCH_NAME (built $BUILD_DATE). Download rattusboard_default.uf2 below and flash to both keyboard halves."
