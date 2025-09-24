@@ -26,10 +26,10 @@
 
 /*
  * Column pins:
- * Left half (master): GP9, GP10, GP11
- * Right half (slave): GP12, GP13, GP14 
+ * Left half (slave): GP9, GP10, GP11
+ * Right half (master): GP12, GP13, GP14 
  */
-#define MATRIX_COL_PINS { GP9, GP10, GP11, GP12, GP13, GP14 }
+#define MATRIX_COL_PINS { GP12, GP13, GP14, GP9, GP10, GP11 }
 
 /* COL2ROW, ROW2COL */
 #define DIODE_DIRECTION COL2ROW
@@ -41,7 +41,7 @@
  * Split keyboard settings 
  */
 #define SPLIT_HAND_PIN GP16
-#define SPLIT_HAND_PIN_LOW_IS_LEFT
+#define SPLIT_HAND_PIN_LOW_IS_RIGHT
 #define SOFT_SERIAL_PIN GP1
 #define SPLIT_USB_DETECT
 
