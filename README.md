@@ -91,14 +91,14 @@ Row 6: GP8  → Connect to all switches in row 6 (thumb cluster)
 
 **Column Connections:**
 
-*Left Half (Master):*
+*Left Half (Slave):*
 ```
-Col 0: GP9  → Connect to all switches in column 0
-Col 1: GP10 → Connect to all switches in column 1
-Col 2: GP11 → Connect to all switches in column 2
+Col 0: GP9  → Connect to all switches in column 0 (left half)
+Col 1: GP10 → Connect to all switches in column 1 (left half)
+Col 2: GP11 → Connect to all switches in column 2 (left half)
 ```
 
-*Right Half (Slave):*
+*Right Half (Master):*
 ```
 Col 3: GP12 → Connect to all switches in column 0 (right half)
 Col 4: GP13 → Connect to all switches in column 1 (right half)
@@ -120,8 +120,8 @@ NC   → TRRS Sleeve (Not connected)
 **Split Detection:**
 ```
 GP16 → Split hand detection pin
-      → Connect to GND on LEFT half only
-      → Leave floating on RIGHT half
+      → Connect to GND on RIGHT half only
+      → Leave floating on LEFT half
 ```
 
 #### PMW3360 Trackball Sensor (Right Half Only)
@@ -159,7 +159,7 @@ GND  → Encoder switch ground
 
 #### Power and USB
 
-**USB Connection (Left Half Only):**
+**USB Connection (Right Half Only):**
 ```
 USB-C connector wired to Pico's native USB pins
 GP25 → Status LED (optional)
@@ -167,7 +167,7 @@ GP25 → Status LED (optional)
 
 **Power Distribution:**
 - 3.3V and GND must be shared between halves via TRRS cable
-- Both Picos powered from left half (master)
+- Both Picos powered from right half (master)
 
 #### Important Wiring Notes
 
@@ -247,7 +247,7 @@ keyboards/rattusboard/
 2. **Resistors**: Install pull-up resistors for I2C communication
 3. **Capacitors**: Add decoupling capacitors near power pins
 4. **TRRS Jacks**: Mount communication connectors
-5. **USB-C**: Install on master half only
+5. **USB-C**: Install on right half (master) only
 
 #### Phase 3: Microcontroller Installation
 1. **Socket Installation** (recommended): Install mill-max sockets
@@ -415,7 +415,7 @@ Layer 0 (Base):
 └─────┴─────┴─────┼─────┼─────┼─────┤   ├─────┼─────┼─────┼─────┴─────┴─────┘
                   │ GUI │ SPC │LOWER│   │RAISE│ ENT │ ALT │
                   └─────┴─────┴─────┘   └─────┴─────┴─────┘
-                           Trackball    Encoder
+                                         Trackball  Encoder
 ```
 
 ---
