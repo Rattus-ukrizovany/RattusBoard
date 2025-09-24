@@ -4,25 +4,29 @@
 #pragma once
 
 /* key matrix size - QMK standard split format */
-#define MATRIX_ROWS 7
-#define MATRIX_COLS 6  // QMK expects 6 cols for a 3x3 split
+#define MATRIX_ROWS 4
+#define MATRIX_COLS 6
 
 /* 
  * Keyboard Matrix Assignments (Raspberry Pi Pico / RP2040)
  * 
- * FULLY INDEPENDENT HALVES - NO SHARED PINS
- * Each half has its own dedicated 3x7 matrix
+ * New Layout: 3x6 main grid + thumb row (row 3)
+ * Matrix per half: 4 rows x 6 columns
+ * 
+ * Thumb cluster arrangement:
+ * - Left half: columns 3, 4, 5
+ * - Right half: columns 0, 1, 2
  * 
  * Left Half (Master):
- * - Rows: GP2, GP3, GP4, GP5, GP6, GP7, GP8 
- * - Cols: GP9, GP10, GP11
+ * - Rows: GP2, GP3, GP4, GP5 (row 3 = thumbs)
+ * - Cols: GP9, GP10, GP11, GP12, GP13, GP14
  * 
  * Right Half (Slave):
- * - Rows: GP2, GP3, GP4, GP5, GP6, GP7, GP8
- * - Cols: GP12, GP13, GP14
+ * - Rows: GP2, GP3, GP4, GP5 (row 3 = thumbs)
+ * - Cols: GP15, GP16, GP17, GP18, GP19, GP20
  */
-#define MATRIX_ROW_PINS { GP2, GP3, GP4, GP5, GP6, GP7, GP8 }
-#define MATRIX_COL_PINS { GP12, GP13, GP14, GP9, GP10, GP11 }
+#define MATRIX_ROW_PINS { GP2, GP3, GP4, GP5 }
+#define MATRIX_COL_PINS { GP15, GP16, GP17, GP9, GP10, GP11 }
 
 /* COL2ROW, ROW2COL */
 #define DIODE_DIRECTION COL2ROW
@@ -33,7 +37,7 @@
 /* 
  * Split keyboard settings 
  */
-#define SPLIT_HAND_PIN GP16
+#define SPLIT_HAND_PIN GP21
 #define SPLIT_HAND_PIN_LOW_IS_LEFT
 #define SOFT_SERIAL_PIN GP1
 #define SPLIT_USB_DETECT
@@ -42,14 +46,14 @@
  * PMW3360 Trackball Configuration
  * Using SPI interface on RP2040
  */
-#define PMW33XX_CS_PIN GP17
+#define PMW33XX_CS_PIN GP22
 #define PMW33XX_CPI 1600
 
 /* SPI Configuration for PMW3360 */
 #define SPI_DRIVER SPID0
-#define SPI_SCK_PIN GP18
-#define SPI_MOSI_PIN GP19
-#define SPI_MISO_PIN GP20
+#define SPI_SCK_PIN GP23
+#define SPI_MOSI_PIN GP24
+#define SPI_MISO_PIN GP25
 
 /*
  * Rotary Encoder Configuration (Mouse Wheel)

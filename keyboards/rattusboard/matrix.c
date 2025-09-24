@@ -9,14 +9,21 @@
 /*
  * Custom matrix implementation for RattusBoard
  * 
- * Physical Design: FULLY INDEPENDENT halves
- * - Left half: Rows GP2-GP8, Cols GP9-GP11 (physically independent)
- * - Right half: Rows GP2-GP8, Cols GP12-GP14 (physically independent)
+ * New Layout: 3x6 main grid + thumb row (row 3)
+ * Matrix per half: 4 rows x 6 columns
  * 
- * QMK Implementation: Standard 6x7 split matrix
- * - Left half scans columns 3-5 (physically GP9-GP11)
- * - Right half scans columns 0-2 (physically GP12-GP14)
- * - Rows are logically shared but physically independent
+ * Thumb cluster arrangement:
+ * - Left half: columns 3, 4, 5 (row 3)
+ * - Right half: columns 0, 1, 2 (row 3)
+ * 
+ * Physical Design:
+ * - Left half: Rows GP2-GP5, Cols GP9-GP14
+ * - Right half: Rows GP2-GP5, Cols GP15-GP20
+ * 
+ * QMK Implementation: Standard 6x4 split matrix
+ * - Left half scans columns 0-5 (physically GP9-GP14)
+ * - Right half scans columns 0-5 (physically GP15-GP20)
+ * - Diode direction: COL2ROW
  */
 
 #ifndef DEBOUNCE
@@ -64,18 +71,11 @@ void matrix_init_custom(void) {
 bool matrix_scan_custom(matrix_row_t current_matrix[]) {
     bool changed = false;
     
-    // Determine which columns to scan based on split half
-    // Physical wiring is independent but QMK expects this logical arrangement
-    uint8_t col_start, col_end;
-    if (isLeftHand) {
-        // Left half physically uses GP9-GP11, maps to logical columns 3-5
-        col_start = 3;
-        col_end = 6;
-    } else {
-        // Right half physically uses GP12-GP14, maps to logical columns 0-2  
-        col_start = 0;
-        col_end = 3;
-    }
+    // New layout: Each half scans all 6 columns (0-5)
+    // Left half: GP9-GP14 (physical) -> columns 0-5 (logical)
+    // Right half: GP15-GP20 (physical) -> columns 0-5 (logical)
+    uint8_t col_start = 0;
+    uint8_t col_end = MATRIX_COLS;
     
     // Scan the matrix (each half scans only its own physical pins)
     for (uint8_t col = col_start; col < col_end; col++) {
