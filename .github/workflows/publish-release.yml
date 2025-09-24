@@ -1,0 +1,60 @@
+name: Publish Firmware Release
+
+# Trigger on push of any git tag
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  publish-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Get tag name
+      id: tag
+      run: echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+      
+    - name: Download firmware artifact
+      uses: dawidd6/action-download-artifact@v3
+      with:
+        # Download from the latest successful build-firmware workflow run
+        workflow: build-firmware.yml
+        name: rattusboard-firmware
+        path: ./artifacts/
+        
+    - name: List downloaded artifacts
+      run: |
+        echo "Downloaded artifacts:"
+        find ./artifacts -type f -name "*.uf2" -o -name "*.txt" | head -10
+        ls -la ./artifacts/
+        
+    - name: Create Release and Upload Asset
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        # Create release with GitHub CLI
+        gh release create "${{ steps.tag.outputs.tag }}" \
+          --title "RattusBoard Firmware ${{ steps.tag.outputs.tag }}" \
+          --notes "## RattusBoard Firmware Release ${{ steps.tag.outputs.tag }}
+
+        This release contains the latest firmware for the RattusBoard split keyboard.
+
+        ### Installation Instructions
+        1. Download \`rattusboard_default.uf2\` from the assets below
+        2. Hold BOOTSEL and plug in USB on each Pico to enter bootloader mode
+        3. Drag \`rattusboard_default.uf2\` onto the RPI-RP2 drive for both halves
+        4. Connect halves with TRRS cable and plug USB into left half
+
+        ### Features
+        - Split keyboard support with auto hand detection
+        - PMW3360 trackball integration (right half)
+        - Rotary encoder support (right half)
+        - VIA/Vial configuration support
+        - Full QMK feature set
+
+        For detailed setup instructions, see the [README](https://github.com/Rattus-ukrizovany/RattusBoard#-firmware-flashing--split-setup-important-clarification)." \
+          ./artifacts/firmware-output/rattusboard_default.uf2
