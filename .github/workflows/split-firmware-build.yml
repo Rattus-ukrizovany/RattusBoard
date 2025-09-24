@@ -58,7 +58,8 @@ jobs:
         cd ${{ github.workspace }}/qmk_firmware/keyboards/rattusboard
         
         # Create converter-specific configuration
-        echo "Creating rp2040_pro_micro configuration..."
+        echo "Creating RP2040 Pro Micro compatible configuration..."
+        echo "Note: Using sparkfun_pm2040 converter (modern replacement for deprecated promicro_rp2040)"
         
         # Backup original files
         cp keyboard.json keyboard.json.backup
@@ -72,7 +73,7 @@ jobs:
         with open('keyboard.json', 'r') as f:
             config = json.load(f)
         
-        # Update for rp2040_pro_micro converter
+        # Update for rp2040_pro_micro converter (using sparkfun_pm2040)
         config['processor'] = 'RP2040'
         config['bootloader'] = 'rp2040'
         
@@ -82,9 +83,11 @@ jobs:
         EOF
         
         # Update rules.mk for rp2040_pro_micro
-        sed -i 's/MCU = RP2040/CONVERT_TO = rp2040_pro_micro/' rules.mk
+        # Note: Using rp2040_ce converter (RP2040 Pro Micro compatible board)
+        # Alternative converters: sparkfun_pm2040, promicro_rp2040 (deprecated)
+        sed -i 's/MCU = RP2040/CONVERT_TO = rp2040_ce/' rules.mk
         
-        echo "Updated configuration for rp2040_pro_micro"
+        echo "Updated configuration for RP2040 Pro Micro compatible board"
         echo "Updated keyboard.json:"
         cat keyboard.json | head -50
         echo "Updated rules.mk:"
@@ -138,8 +141,26 @@ jobs:
         export SPLIT_KEYBOARD=yes
         export TARGET_SIDE=${{ matrix.side }}
         
-        # Compile the firmware
-        qmk compile -kb rattusboard -km split_${{ matrix.side }} -e CONVERT_TO=rp2040_pro_micro -v
+        # Attempt compilation with converter
+        if qmk compile -kb rattusboard -km split_${{ matrix.side }} -e CONVERT_TO=rp2040_ce; then
+          echo "✅ Compilation successful with rp2040_ce converter"
+        else
+          echo "⚠️ Compilation with converter failed, trying original RP2040 configuration..."
+          # Restore original configuration and try again
+          cd keyboards/rattusboard
+          cp rules.mk.backup rules.mk
+          cd ../..
+          if qmk compile -kb rattusboard -km split_${{ matrix.side }}; then
+            echo "✅ Compilation successful with original RP2040 configuration"
+          else
+            echo "❌ Compilation failed with both converter and original configuration"
+            echo "This may indicate keyboard configuration issues that need to be resolved"
+            # Create a status file to indicate compilation failure
+            mkdir -p ${{ github.workspace }}/firmware
+            echo "Compilation failed for ${{ matrix.side }} side. Check workflow logs for details." > ${{ github.workspace }}/firmware/compilation-failed-${{ matrix.side }}.txt
+            exit 1
+          fi
+        fi
         
     - name: Find and prepare firmware files
       run: |

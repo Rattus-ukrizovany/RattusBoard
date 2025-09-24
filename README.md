@@ -237,7 +237,7 @@ The firmware is automatically built and released using GitHub Actions:
 - ✅ **On pull requests** - Testing builds for validation
 
 #### 🔄 Split Keyboard Firmware Downloads
-The RattusBoard uses a split keyboard design requiring separate firmware files for each half. Both sides use the **rp2040_pro_micro** MCU target.
+The RattusBoard uses a split keyboard design requiring separate firmware files for each half. Both sides use the **rp2040_pro_micro** MCU target (implemented via QMK's `rp2040_ce` converter for RP2040 Pro Micro compatible boards).
 
 **Latest Build Artifacts:**
 - **[Left Side Firmware](https://github.com/Rattus-ukrizovany/RattusBoard/actions/workflows/split-firmware-build.yml)** - `rattusboard_left-rp2040_pro_micro-firmware`
@@ -256,6 +256,7 @@ The RattusBoard uses a split keyboard design requiring separate firmware files f
 - ⚠️ **Flash the correct firmware to each side** - left firmware to left half, right firmware to right half
 - 🔄 **Artifacts are available for 90 days** after each build
 - 🏷️ **Release builds** permanently attach firmware files to GitHub releases
+- 💡 **Technical Note**: Uses QMK's `rp2040_ce` converter for RP2040 Pro Micro compatible boards
 
 #### What's Included
 - **Full QMK firmware** with Vial support
