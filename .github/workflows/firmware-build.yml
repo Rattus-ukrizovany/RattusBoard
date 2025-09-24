@@ -1,0 +1,161 @@
+name: Build RattusBoard Firmware
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'keyboards/rattusboard/**'
+      - '.github/workflows/firmware-build.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'keyboards/rattusboard/**'
+      - '.github/workflows/firmware-build.yml'
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+        
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y git python3-pip
+        
+    - name: Install QMK CLI
+      run: |
+        python3 -m pip install --upgrade pip
+        pip3 install qmk
+        
+    - name: Validate keyboard configuration
+      run: |
+        echo "🔍 Validating keyboard configuration files..."
+        
+        # Check required files exist
+        REQUIRED_FILES=(
+          "keyboards/rattusboard/config.h"
+          "keyboards/rattusboard/rules.mk"
+          "keyboards/rattusboard/info.json"
+          "keyboards/rattusboard/rattusboard.h"
+          "keyboards/rattusboard/rattusboard.c"
+          "keyboards/rattusboard/keymaps/default/keymap.c"
+        )
+        
+        for file in "${REQUIRED_FILES[@]}"; do
+          if [ -f "$file" ]; then
+            echo "✅ $file"
+          else
+            echo "❌ $file MISSING"
+            exit 1
+          fi
+        done
+        
+        # Validate JSON syntax
+        echo "📋 Validating info.json syntax..."
+        python3 -m json.tool keyboards/rattusboard/info.json > /dev/null
+        echo "✅ info.json is valid"
+        
+        echo "🎉 All configuration files validated successfully!"
+        
+    - name: Setup QMK environment
+      run: |
+        export QMK_HOME="${{ github.workspace }}/qmk_firmware"
+        qmk setup -y -H "$QMK_HOME"
+        
+    - name: Copy keyboard files to QMK
+      run: |
+        cp -r keyboards/rattusboard ${{ github.workspace }}/qmk_firmware/keyboards/
+        
+    - name: Verify keyboard files
+      run: |
+        echo "Checking keyboard files in QMK directory:"
+        ls -la ${{ github.workspace }}/qmk_firmware/keyboards/rattusboard/
+        echo "Checking keymap:"
+        ls -la ${{ github.workspace }}/qmk_firmware/keyboards/rattusboard/keymaps/default/
+        echo "Content of rules.mk:"
+        cat ${{ github.workspace }}/qmk_firmware/keyboards/rattusboard/rules.mk
+        
+    - name: Compile firmware
+      run: |
+        cd ${{ github.workspace }}/qmk_firmware
+        echo "Starting firmware compilation..."
+        qmk compile -kb rattusboard -km default -v
+        
+    - name: Find and prepare firmware files
+      run: |
+        cd ${{ github.workspace }}/qmk_firmware
+        echo "Searching for compiled firmware files..."
+        find . -name "*.uf2" -type f -ls
+        
+        # Find the generated .uf2 file (it might be in different locations)
+        FIRMWARE_FILE=$(find . -name "rattusboard_default.uf2" -type f | head -1)
+        if [ -z "$FIRMWARE_FILE" ]; then
+          FIRMWARE_FILE=$(find . -name "*.uf2" -type f | grep -i rattus | head -1)
+        fi
+        if [ -z "$FIRMWARE_FILE" ]; then
+          FIRMWARE_FILE=$(find . -name "*.uf2" -type f | head -1)
+        fi
+        
+        if [ -n "$FIRMWARE_FILE" ]; then
+          echo "Found firmware file: $FIRMWARE_FILE"
+          # Create firmware output directory
+          mkdir -p ${{ github.workspace }}/firmware
+          
+          # Copy and rename firmware based on event type
+          if [ "${{ github.event_name }}" == "release" ]; then
+            cp "$FIRMWARE_FILE" ${{ github.workspace }}/firmware/rattusboard_${{ github.event.release.tag_name }}.uf2
+            cp "$FIRMWARE_FILE" ${{ github.workspace }}/firmware/rattusboard_latest.uf2
+            echo "Created release firmware files"
+          else
+            # For non-release builds, use commit SHA
+            SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
+            cp "$FIRMWARE_FILE" ${{ github.workspace }}/firmware/rattusboard_${SHORT_SHA}.uf2
+            cp "$FIRMWARE_FILE" ${{ github.workspace }}/firmware/rattusboard_latest.uf2
+            echo "Created development firmware files"
+          fi
+          
+          echo "Firmware files created:"
+          ls -la ${{ github.workspace }}/firmware/
+          
+          # Calculate file sizes and checksums
+          echo "File information:"
+          for file in ${{ github.workspace }}/firmware/*.uf2; do
+            echo "$(basename "$file"): $(stat -c%s "$file") bytes, SHA256: $(sha256sum "$file" | cut -d' ' -f1)"
+          done
+        else
+          echo "ERROR: No firmware file found!"
+          echo "Available files:"
+          find . -name "*.uf2" -o -name "*.bin" -o -name "*.hex" -type f -ls
+          exit 1
+        fi
+        
+    - name: Upload firmware artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: rattusboard-firmware-${{ github.run_number }}
+        path: firmware/
+        retention-days: 90
+        
+    - name: Upload firmware to release
+      if: github.event_name == 'release'
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          firmware/rattusboard_${{ github.event.release.tag_name }}.uf2
+          firmware/rattusboard_latest.uf2
+        tag_name: ${{ github.event.release.tag_name }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

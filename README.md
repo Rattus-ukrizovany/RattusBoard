@@ -288,6 +288,28 @@ qmk setup
 cp -r keyboards/rattusboard ~/.local/share/qmk/keyboards/
 ```
 
+### 📦 Firmware Download
+
+#### Latest Release
+[![Latest Release](https://img.shields.io/github/v/release/Rattus-ukrizovany/RattusBoard?include_prereleases&label=Latest%20Firmware)](https://github.com/Rattus-ukrizovany/RattusBoard/releases/latest)
+
+**Quick Download:**
+- **[Download Latest Firmware (.uf2)](https://github.com/Rattus-ukrizovany/RattusBoard/releases/latest/download/rattusboard_latest.uf2)** ⬇️
+- **[All Releases & Versions](https://github.com/Rattus-ukrizovany/RattusBoard/releases)** 📋
+
+#### Automated Builds
+The firmware is automatically built and released using GitHub Actions:
+- ✅ **On every release** - Tagged version with release assets
+- ✅ **On main branch changes** - Development builds available as artifacts
+- ✅ **On pull requests** - Testing builds for validation
+
+#### What's Included
+- **Full QMK firmware** with Vial support
+- **4-layer default keymap** (Base, Lower, Raise, Adjust)
+- **PMW3360 trackball support** with configurable DPI
+- **Rotary encoder support** with per-layer functions
+- **Split keyboard functionality** for both halves
+
 ### 📁 QMK Firmware Files
 
 The RattusBoard firmware includes the following files located in `keyboards/rattusboard/`:
@@ -308,11 +330,17 @@ The RattusBoard firmware includes the following files located in `keyboards/ratt
 
 ### Flashing Process
 
-#### Method 1: Pre-compiled Firmware (Recommended)
-1. Download the latest firmware from [Releases](../../releases)
-2. Put Pico in bootloader mode (hold BOOTSEL while connecting USB)
-3. Drag and drop `.uf2` file to mounted drive
-4. Repeat for second half
+#### Method 1: Pre-compiled Firmware (Recommended) ⭐
+1. **Download** the latest firmware:
+   - **[Direct Download](https://github.com/Rattus-ukrizovany/RattusBoard/releases/latest/download/rattusboard_latest.uf2)** (Latest version)
+   - Or browse **[All Releases](https://github.com/Rattus-ukrizovany/RattusBoard/releases)** for specific versions
+2. **Prepare the first Raspberry Pi Pico**:
+   - Hold **BOOTSEL** button while connecting USB cable
+   - Pico will appear as a USB drive named "RPI-RP2"
+3. **Flash the firmware**:
+   - Drag and drop the `.uf2` file to the "RPI-RP2" drive
+   - The Pico will automatically reboot with new firmware
+4. **Repeat for the second half** (right side of keyboard)
 
 #### Method 2: Compile from Source
 ```bash
@@ -467,6 +495,32 @@ We welcome contributions to make RattusBoard even better! Here's how you can hel
 4. **Make Changes**: Implement your improvements
 5. **Test Thoroughly**: Verify changes work as expected
 6. **Submit PR**: Create pull request with detailed description
+
+### Automated Firmware Builds
+
+The repository includes GitHub Actions automation for firmware building:
+
+#### 🔄 **Continuous Integration**
+- **Pull Request Builds**: Every PR automatically builds firmware to catch issues early
+- **Main Branch Builds**: Commits to main trigger development builds
+- **Release Builds**: Tagged releases automatically build and attach firmware files
+
+#### 📦 **Build Artifacts**
+- **PR/Development Builds**: Available as workflow artifacts for 90 days
+- **Release Builds**: Permanently attached to GitHub releases
+- **Latest Build**: Always available as `rattusboard_latest.uf2`
+
+#### 🛠️ **Local Development**
+```bash
+# Validate keyboard configuration
+python3 -m json.tool keyboards/rattusboard/info.json
+
+# Check required files
+ls keyboards/rattusboard/{config.h,rules.mk,info.json,rattusboard.{h,c}}
+
+# Test with QMK (requires QMK setup)
+qmk compile -kb rattusboard -km default
+```
 
 ### Code Standards
 
