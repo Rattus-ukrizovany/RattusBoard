@@ -93,17 +93,83 @@ Left Half (Master)              Right Half (Slave)
                                └─────────────────┘
 ```
 
-#### 📋 Essential Pin Assignments
+#### 📋 Complete Pin Assignment Reference
 
-| Component | Left Half | Right Half | Notes |
-|-----------|-----------|------------|-------|
-| **Matrix Rows** | GP2-GP8 | GP2-GP8 | **INDEPENDENT** - No shared pins |
-| **Matrix Cols** | GP9-GP11 | GP12-GP14 | **FULLY INDEPENDENT** matrices |
-| **Split Comm** | GP1 | GP1 | TRRS serial connection |
-| **Hand Detection** | GP16→GND | GP16 (float) | **Critical configuration** |
-| **USB Power** | Native | - | Left half only |
-| **Trackball SPI** | - | GP17-GP20 | Right half only |
-| **Encoder** | - | GP21-GP22 | Right half only |
+| Component | Function | Left Half | Right Half | Notes |
+|-----------|----------|-----------|------------|-------|
+| **Matrix Rows** | Key scanning | GP2-GP8 | GP2-GP8 | **INDEPENDENT** - No shared pins |
+| **Matrix Cols** | Key scanning | GP9-GP11 | GP12-GP14 | **FULLY INDEPENDENT** matrices |
+| **Split Comm** | UART Serial | GP0/GP1 | GP0/GP1 | Full-duplex serial over TRRS |
+| **Hand Detection** | Split ID | GP16→GND | GP16 (float) | **Critical for auto-detection** |
+| **USB Power** | Host connection | Native USB-C | - | Left half only (master) |
+| **PMW3360 CS** | SPI Chip Select | - | GP17 | Trackball sensor control |
+| **PMW3360 SCK** | SPI Clock | - | GP18 | High-speed SPI clock |
+| **PMW3360 MOSI** | SPI Data Out | - | GP19 | Data to sensor |
+| **PMW3360 MISO** | SPI Data In | - | GP20 | Data from sensor |
+| **PMW3360 Motion** | Interrupt | - | GP23 (opt) | Motion detection |
+| **Encoder A** | Quadrature | - | GP21 | Rotary encoder phase A |
+| **Encoder B** | Quadrature | - | GP22 | Rotary encoder phase B |
+| **Boot LED** | System | GP25 | GP25 | RP2040 onboard LED |
+
+### 🔌 Enhanced Wiring Diagram
+
+```
+         RattusBoard Split Keyboard Architecture
+         =======================================
+
+Left Half (Master)                    Right Half (Slave)
+┌─────────────────────┐               ┌─────────────────────┐
+│  [USB-C INPUT]      │               │                     │
+│  Raspberry Pi Pico  │◄──── TRRS ────┤  Raspberry Pi Pico  │
+│  RP2040 Master      │               │  RP2040 Slave       │
+│                     │               │                     │
+│  Matrix: 3×7        │               │  Matrix: 3×7        │
+│  ┌─────────────┐    │               │  ┌─────────────┐    │
+│  │ GP2-GP8     │    │               │  │ GP2-GP8     │    │
+│  │ (Rows)      │    │               │  │ (Rows)      │    │
+│  │ GP9-GP11    │    │               │  │ GP12-GP14   │    │
+│  │ (Cols)      │    │               │  │ (Cols)      │    │  
+│  └─────────────┘    │               │  └─────────────┘    │
+│                     │               │                     │
+│  GP16 → GND (Left)  │               │  GP16 (Float/Right) │
+│  GP0/GP1 (UART)    │               │  GP0/GP1 (UART)    │
+└─────────────────────┘               │                     │
+                                      │  🖲️ PMW3360 Module  │
+                                      │  ┌─────────────┐    │
+                                      │  │ GP17 (CS)   │    │
+                                      │  │ GP18 (SCK)  │    │
+                                      │  │ GP19 (MOSI) │    │
+                                      │  │ GP20 (MISO) │    │
+                                      │  │ GP23 (MOT)  │    │
+                                      │  └─────────────┘    │
+                                      │                     │
+                                      │  🎛️ Rotary Encoder  │
+                                      │  ┌─────────────┐    │
+                                      │  │ GP21 (A)    │    │
+                                      │  │ GP22 (B)    │    │
+                                      │  │ [GP24 (SW)] │    │
+                                      │  └─────────────┘    │
+                                      └─────────────────────┘
+
+TRRS Cable Wiring:
+┌─────────────────────────────────────────────────────────┐
+│ Tip    (T): GND        Ring 1 (R1): UART TX/RX         │
+│ Ring 2 (R2): 3.3V      Sleeve (S): UART RX/TX          │
+└─────────────────────────────────────────────────────────┘
+```
+
+### 🎯 Feature Implementation Status
+
+| Feature | Status | Implementation | Notes |
+|---------|--------|----------------|-------|
+| **Split Keyboard** | ✅ Complete | UART Serial | Hardware auto-detection |
+| **PMW3360 Trackball** | ✅ Complete | SPI Driver | 1600 DPI, configurable |
+| **Rotary Encoder** | ✅ Complete | Quadrature | 4 steps/detent, per-layer |
+| **VIA/VIAL Support** | ✅ Complete | JSON Config | Real-time keymap editing |
+| **4-Layer Layout** | ✅ Complete | QMK Layers | Base, Lower, Raise, Adjust |
+| **Trackball Controls** | ✅ Complete | Custom Keys | DPI adjust, scroll toggle |
+| **Encoder Functions** | ✅ Complete | Per-Layer | Scroll, volume, brightness |
+| **Custom Matrix** | ✅ Complete | Split-aware | Independent matrices |
 
 
 #### 🔧 Quick Assembly Steps
@@ -114,6 +180,133 @@ Left Half (Master)              Right Half (Slave)
 4. **Install TRRS jacks** and verify cable connectivity
 5. **Add peripherals** (trackball, encoder on right half)
 6. **Test thoroughly** before final assembly
+
+---
+
+## 🎹 Keymap Overview
+
+RattusBoard features a 4-layer layout adapted from the popular Corne keyboard, optimized for productivity and comfort with integrated trackball and encoder functionality.
+
+### 📊 Layer Architecture
+
+```
+Layer Stack:
+┌─────────────┐
+│   ADJUST    │ ← System, Mouse, Reset
+├─────────────┤
+│    RAISE    │ ← Symbols, Media Controls  
+├─────────────┤
+│    LOWER    │ ← Numbers, F-keys, Navigation
+├─────────────┤
+│    BASE     │ ← QWERTY Layout (Default)
+└─────────────┘
+```
+
+### 🗝️ Layer Details
+
+#### **Layer 0: BASE (QWERTY)**
+```
+┌─────┬─────┬─────┬─────┬─────┬─────┐   ┌─────┬─────┬─────┬─────┬─────┬─────┐
+│  Q  │  W  │  E  │  R  │  T  │     │   │     │  Y  │  U  │  I  │  O  │  P  │
+├─────┼─────┼─────┼─────┼─────┼─────┤   ├─────┼─────┼─────┼─────┼─────┼─────┤
+│  A  │  S  │  D  │  F  │  G  │     │   │     │  H  │  J  │  K  │  L  │  ;  │
+├─────┼─────┼─────┼─────┼─────┼─────┤   ├─────┼─────┼─────┼─────┼─────┼─────┤
+│  Z  │  X  │  C  │  V  │  B  │     │   │     │  N  │  M  │  ,  │  .  │  /  │
+└─────┴─────┴─────┼─────┼─────┼─────┤   ├─────┼─────┼─────┼─────┴─────┴─────┘
+                  │ GUI │ SPC │LOWER│   │RAISE│ ENT │ ALT │
+                  └─────┴─────┴─────┘   └─────┴─────┴─────┘
+                                          🖲️     🎛️
+                                      Trackball Encoder
+```
+**Trackball:** Cursor movement, click & drag  
+**Encoder:** Vertical scroll (↕️)
+
+#### **Layer 1: LOWER (Numbers & Navigation)**
+```
+┌─────┬─────┬─────┬─────┬─────┬─────┐   ┌─────┬─────┬─────┬─────┬─────┬─────┐
+│  1  │  2  │  3  │  4  │  5  │  6  │   │  6  │  7  │  8  │  9  │  0  │BSPC │
+├─────┼─────┼─────┼─────┼─────┼─────┤   ├─────┼─────┼─────┼─────┼─────┼─────┤
+│ F1  │ F2  │ F3  │ F4  │ F5  │ F6  │   │ F6  │ F7  │ F8  │ F9  │ F10 │ F11 │
+├─────┼─────┼─────┼─────┼─────┼─────┤   ├─────┼─────┼─────┼─────┼─────┼─────┤
+│F11  │F12  │TB_TO│DPI- │DPI+ │     │   │     │ ←   │ ↓   │ ↑   │ →   │     │
+└─────┴─────┴─────┼─────┼─────┼─────┤   ├─────┼─────┼─────┼─────┴─────┴─────┘
+                  │ GUI │ SPC │ --- │   │ADJST│ ENT │ ALT │
+                  └─────┴─────┴─────┘   └─────┴─────┴─────┘
+```
+**Trackball:** TB_TOG = Toggle scroll mode, DPI± = Sensitivity  
+**Encoder:** Volume control (🔊)
+
+#### **Layer 2: RAISE (Symbols & Media)**
+```
+┌─────┬─────┬─────┬─────┬─────┬─────┐   ┌─────┬─────┬─────┬─────┬─────┬─────┐
+│  !  │  @  │  #  │  $  │  %  │  ^  │   │  ^  │  &  │  *  │  (  │  )  │BSPC │
+├─────┼─────┼─────┼─────┼─────┼─────┤   ├─────┼─────┼─────┼─────┼─────┼─────┤
+│  -  │  =  │  [  │  ]  │  \  │  '  │   │  '  │  ;  │  ,  │  .  │  /  │  `  │
+├─────┼─────┼─────┼─────┼─────┼─────┤   ├─────┼─────┼─────┼─────┼─────┼─────┤
+│  _  │  +  │  {  │  }  │  |  │MUTE │   │MUTE │VOL- │VOL+ │PLAY │NEXT │     │
+└─────┴─────┴─────┼─────┼─────┼─────┤   ├─────┼─────┼─────┼─────┴─────┴─────┘
+                  │ GUI │ SPC │ADJST│   │ --- │ ENT │ ALT │
+                  └─────┴─────┴─────┘   └─────┴─────┴─────┘
+```
+**Trackball:** Cursor movement  
+**Encoder:** Horizontal scroll (↔️)
+
+#### **Layer 3: ADJUST (System & Mouse)**
+```
+┌─────┬─────┬─────┬─────┬─────┬─────┐   ┌─────┬─────┬─────┬─────┬─────┬─────┐
+│RESET│     │     │     │     │     │   │     │     │     │     │     │RESET│
+├─────┼─────┼─────┼─────┼─────┼─────┤   ├─────┼─────┼─────┼─────┼─────┼─────┤
+│     │     │     │     │     │MS_L │   │MS_L │MS_D │MS_U │MS_R │     │     │
+├─────┼─────┼─────┼─────┼─────┼─────┤   ├─────┼─────┼─────┼─────┼─────┼─────┤
+│     │     │     │     │     │BTN1 │   │BTN1 │BTN2 │BTN3 │     │     │     │
+└─────┴─────┴─────┼─────┼─────┼─────┤   ├─────┼─────┼─────┼─────┴─────┴─────┘
+                  │ GUI │ SPC │ --- │   │ --- │ ENT │ ALT │
+                  └─────┴─────┴─────┘   └─────┴─────┴─────┘  
+```
+**Trackball:** Mouse emulation (for backup/precision)  
+**Encoder:** Brightness control (🔆)
+
+### 🎛️ Encoder Functions by Layer
+
+| Layer | Function | CCW (↺) | CW (↻) |
+|-------|----------|---------|--------|
+| **BASE** | Scroll | Scroll Up | Scroll Down |
+| **LOWER** | Audio | Volume Down | Volume Up |
+| **RAISE** | Scroll | Scroll Left | Scroll Right |
+| **ADJUST** | Display | Brightness Down | Brightness Up |
+
+### 🖲️ Trackball Modes
+
+| Mode | Activation | Function | Use Case |
+|------|------------|----------|----------|
+| **Cursor** | Default | Mouse movement | Navigation, selection |
+| **Scroll** | TB_TOG key | Scroll wheel | Document scrolling |
+| **DPI Low** | TB_DPI_DN | Precision mode | Fine adjustments |
+| **DPI High** | TB_DPI_UP | Speed mode | Quick movements |
+
+---
+
+## 📸 Visual Preview
+
+> **Coming Soon!** 📷  
+> This section will showcase:
+> - ✨ Assembled keyboard glamour shots
+> - 🔍 Close-up details of trackball integration  
+> - 🎛️ Rotary encoder implementation
+> - 📐 Size comparison with standard keyboards
+> - 🌈 RGB lighting effects (if implemented)
+> - 🎨 Various keycap and switch combinations
+
+*Please share your RattusBoard builds! Photos welcome for this gallery.*
+
+### 🎯 Build Showcase Categories
+- **Clean Builds**: Minimalist, professional setups
+- **RGB Builds**: Colorful, illuminated configurations  
+- **Custom Builds**: Unique modifications and improvements
+- **Work Setups**: Professional desk integrations
+- **Gaming Rigs**: Performance-focused configurations
+
+**📧 Submit your photos:** Create an issue with the "showcase" label or PR with images!
 
 **For complete step-by-step instructions, wiring diagrams, troubleshooting, and testing procedures, refer to [HALVES_WIRING.md](HALVES_WIRING.md).**
 
@@ -261,44 +454,114 @@ The RattusBoard firmware includes the following files located in `keyboards/ratt
 **Default Keymap:**
 - `keymaps/default/keymap.c` - Default 4-layer keymap with encoder scroll wheel support
 
-### Flashing Process
+### 🚀 Enhanced Flashing Guide
 
-#### Method 1: Pre-compiled Firmware (Recommended) ⭐
-1. **Download** the latest firmware:
-   - **[Direct Download](https://github.com/Rattus-ukrizovany/RattusBoard/releases/latest/download/rattusboard_latest.uf2)** (Latest version)
-   - Or browse **[All Releases](https://github.com/Rattus-ukrizovany/RattusBoard/releases)** for specific versions
-2. **Prepare the first Raspberry Pi Pico**:
-   - Hold **BOOTSEL** button while connecting USB cable
-   - Pico will appear as a USB drive named "RPI-RP2"
-3. **Flash the firmware**:
-   - Drag and drop the `.uf2` file to the "RPI-RP2" drive
-   - The Pico will automatically reboot with new firmware
-4. **Repeat for the second half** (right side of keyboard)
+#### 📦 Quick Start (5 Minutes)
 
-#### Method 2: Compile from Source
+**What You Need:**
+- 2× Raspberry Pi Pico microcontrollers
+- 1× USB-C cable  
+- Computer with web browser
+
+**Step-by-Step:**
+
+1. **📥 Download Firmware**
+   ```
+   Latest Release: rattusboard_default.uf2
+   🔗 https://github.com/Rattus-ukrizovany/RattusBoard/releases/latest
+   ```
+
+2. **🔌 Flash Left Half (Master)**
+   - Hold **BOOTSEL** + Connect USB → Pico shows as **RPI-RP2** drive
+   - Drag `rattusboard_default.uf2` to the drive
+   - ✅ Pico reboots automatically with firmware
+
+3. **🔌 Flash Right Half (Slave)**  
+   - Repeat step 2 with second Pico
+   - ✅ Same firmware works for both halves
+
+4. **🔗 Connect & Test**
+   - Connect halves with TRRS cable
+   - Plug USB into **left half only**
+   - ✅ Both halves should work!
+
+#### 🛠️ Advanced Compilation
+
+**Prerequisites:**
 ```bash
-# Navigate to QMK directory
-cd qmk_firmware
+# Install QMK CLI
+pip3 install qmk
 
-# Copy keyboard files (if not done already)
-cp -r /path/to/RattusBoard/keyboards/rattusboard keyboards/
-
-# Compile firmware
-qmk compile -kb rattusboard -km default
-
-# Flash to keyboard
-qmk flash -kb rattusboard -km default
+# Setup QMK environment
+qmk setup
 ```
 
-#### Method 3: Using QMK Configurator
-1. Upload the `info.json` file to [QMK Configurator](https://config.qmk.fm/)
-2. Design your keymap visually
-3. Download the compiled firmware
-4. Flash using QMK Toolbox
+**Build Custom Firmware:**
+```bash
+# Clone RattusBoard
+git clone https://github.com/Rattus-ukrizovany/RattusBoard.git
+cd RattusBoard
 
-#### Bootloader Mode
-- **Initial Flash**: Hold BOOTSEL button while connecting USB
-- **Subsequent Flashes**: Use reset button or `QK_BOOT` key in keymap
+# Copy to QMK directory
+cp -r keyboards/rattusboard ~/.local/share/qmk/keyboards/
+
+# Compile with custom keymap
+qmk compile -kb rattusboard -km default
+
+# Output: rattusboard_default.uf2
+```
+
+**Flash Directly:**
+```bash
+# Flash while in bootloader mode
+qmk flash -kb rattusboard -km default
+
+# Or use QMK Toolbox GUI
+```
+
+#### 🔧 Troubleshooting Flash Issues
+
+| Problem | Solution |
+|---------|----------|
+| **Pico not detected** | Try different USB cable, ensure BOOTSEL held during connection |
+| **Drive disappears** | Normal behavior - Pico reboots after firmware flash |
+| **No response** | Check TRRS cable, verify both halves flashed |
+| **Keys not working** | Test with key tester website, check matrix wiring |
+| **Trackball issues** | Verify SPI connections, clean sensor lens |
+| **Encoder problems** | Check quadrature pins, test with encoder test |
+
+#### ⚙️ Firmware Customization Options
+
+**1. VIA/VIAL (Real-time editing)** ⭐
+- Download **Vial** from [get.vial.today](https://get.vial.today)  
+- Keyboard auto-detected with included `vial.json`
+- Edit keymap, macros, encoder functions live
+
+**2. QMK Configurator (Web-based)**
+- Upload `keyboard.json` to [config.qmk.fm](https://config.qmk.fm)
+- Design keymap visually
+- Download compiled firmware
+
+**3. Source Code (Advanced)**
+- Modify `keymaps/default/keymap.c`
+- Add custom functions in `rattusboard.c`
+- Build with `qmk compile`
+
+#### 🎯 Validation Checklist
+
+After flashing, verify these features work:
+
+- [ ] **All keys register** (use online key tester)
+- [ ] **Split communication** (both halves respond)  
+- [ ] **Layer switching** (LOWER/RAISE keys)
+- [ ] **Trackball movement** (cursor moves smoothly)  
+- [ ] **Trackball clicking** (left/right click works)
+- [ ] **Encoder rotation** (scroll wheel functions)
+- [ ] **Trackball toggle** (TB_TOG switches scroll mode)
+- [ ] **DPI adjustment** (TB_DPI_UP/DN changes sensitivity)
+- [ ] **Per-layer encoder** (different functions each layer)
+
+**🎉 Success!** Your RattusBoard is ready for use!
 
 ### 🔧 Split Keyboard Configuration
 

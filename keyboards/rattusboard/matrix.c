@@ -138,25 +138,3 @@ bool matrix_scan_custom(matrix_row_t current_matrix[]) {
     matrix_scan_kb();
     return changed;
 }
-
-void matrix_init(void) {
-    matrix_init_custom();
-}
-
-uint8_t matrix_scan(void) {
-    bool changed = matrix_scan_custom(matrix);
-    return (uint8_t)changed;
-}
-
-matrix_row_t matrix_get_row(uint8_t row) {
-    return matrix[row];
-}
-
-void matrix_print(void) {
-    print("\nr/c 01234567\n");
-    for (uint8_t row = 0; row < MATRIX_ROWS; row++) {
-        print_hex8(row); print(": ");
-        print_bin_reverse16(matrix_get_row(row));
-        print("\n");
-    }
-}
