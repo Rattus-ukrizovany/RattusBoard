@@ -3,25 +3,25 @@
 
 #pragma once
 
-/* key matrix size */
+/* key matrix size - QMK standard split format */
 #define MATRIX_ROWS 7
-#define MATRIX_COLS 6
+#define MATRIX_COLS 6  // QMK expects 6 cols for a 3x3 split
 
 /* 
  * Keyboard Matrix Assignments (Raspberry Pi Pico / RP2040)
  * 
- * The matrix is configured as 6x7 for Corne-style layout
- * Left half uses columns 3-5, right half uses columns 0-2
+ * FULLY INDEPENDENT HALVES - NO SHARED PINS
+ * Each half has its own dedicated 3x7 matrix
  * 
- * Row pins (shared between halves):
+ * Left Half (Master):
+ * - Rows: GP2, GP3, GP4, GP5, GP6, GP7, GP8 
+ * - Cols: GP9, GP10, GP11
+ * 
+ * Right Half (Slave):
+ * - Rows: GP2, GP3, GP4, GP5, GP6, GP7, GP8
+ * - Cols: GP12, GP13, GP14
  */
 #define MATRIX_ROW_PINS { GP2, GP3, GP4, GP5, GP6, GP7, GP8 }
-
-/*
- * Column pins:
- * Left half (slave): GP9, GP10, GP11
- * Right half (master): GP12, GP13, GP14 
- */
 #define MATRIX_COL_PINS { GP12, GP13, GP14, GP9, GP10, GP11 }
 
 /* COL2ROW, ROW2COL */
@@ -34,7 +34,7 @@
  * Split keyboard settings 
  */
 #define SPLIT_HAND_PIN GP16
-#define SPLIT_HAND_PIN_LOW_IS_RIGHT
+#define SPLIT_HAND_PIN_LOW_IS_LEFT
 #define SOFT_SERIAL_PIN GP1
 #define SPLIT_USB_DETECT
 
@@ -42,10 +42,8 @@
  * PMW3360 Trackball Configuration
  * Using SPI interface on RP2040
  */
-#define POINTING_DEVICE_ENABLE
-#define POINTING_DEVICE_DRIVER pmw3360
-#define PMW3360_CS_PIN GP17
-#define PMW3360_CPI 1600
+#define PMW33XX_CS_PIN GP17
+#define PMW33XX_CPI 1600
 
 /* SPI Configuration for PMW3360 */
 #define SPI_DRIVER SPID0
@@ -57,12 +55,7 @@
  * Rotary Encoder Configuration (Mouse Wheel)
  * Connected to right half for scroll wheel functionality
  */
-#define ENCODERS_PAD_A { GP21 }
-#define ENCODERS_PAD_B { GP22 }
-#define ENCODER_RESOLUTION 4
-
-/* Enable encoder mapping */
-#define ENCODER_MAP_ENABLE
+// Note: ENCODERS_PAD_A and ENCODERS_PAD_B defined in keyboard.json
 
 /*
  * Feature flags

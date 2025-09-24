@@ -85,10 +85,10 @@ report_mouse_t pointing_device_task_kb(report_mouse_t mouse_report) {
  */
 #if defined(ENCODER_MAP_ENABLE)
 const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][2] = {
-    [0] = { ENCODER_CCW_CW(KC_MS_WH_UP, KC_MS_WH_DOWN) },  // Base layer: scroll wheel
-    [1] = { ENCODER_CCW_CW(KC_VOLD, KC_VOLU) },            // Layer 1: volume control
-    [2] = { ENCODER_CCW_CW(KC_MS_WH_LEFT, KC_MS_WH_RIGHT) }, // Layer 2: horizontal scroll
-    [3] = { ENCODER_CCW_CW(KC_TRNS, KC_TRNS) },            // Layer 3: transparent
+    [0] = { ENCODER_CCW_CW(QK_MOUSE_WHEEL_UP, QK_MOUSE_WHEEL_DOWN) },      // Base layer: scroll wheel
+    [1] = { ENCODER_CCW_CW(KC_VOLD, KC_VOLU) },                            // Layer 1: volume control
+    [2] = { ENCODER_CCW_CW(QK_MOUSE_WHEEL_LEFT, QK_MOUSE_WHEEL_RIGHT) },   // Layer 2: horizontal scroll
+    [3] = { ENCODER_CCW_CW(KC_BRID, KC_BRIU) },                            // Layer 3: brightness
 };
 #endif
 

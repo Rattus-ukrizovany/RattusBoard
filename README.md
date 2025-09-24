@@ -86,7 +86,7 @@ Left Half (Master)              Right Half (Slave)
 │ Raspberry Pi    │◄── TRRS ──►│ Raspberry Pi    │
 │ Pico            │            │ Pico            │
 │                 │            │                 │
-│ Matrix: 3×7     │            │ Matrix: 3×7     │
+│ INDEPENDENT 3×7 │            │ INDEPENDENT 3×7 │
 │ GP16 → GND      │            │ GP16 (floating) │
 └─────────────────┘            │ [PMW3360]       │
                                │ [Encoder]       │
@@ -97,8 +97,8 @@ Left Half (Master)              Right Half (Slave)
 
 | Component | Left Half | Right Half | Notes |
 |-----------|-----------|------------|-------|
-| **Matrix Rows** | GP2-GP8 | GP2-GP8 | Shared across both halves |
-| **Matrix Cols** | GP9-GP11 | GP12-GP14 | 3 columns per half |
+| **Matrix Rows** | GP2-GP8 | GP2-GP8 | **INDEPENDENT** - No shared pins |
+| **Matrix Cols** | GP9-GP11 | GP12-GP14 | **FULLY INDEPENDENT** matrices |
 | **Split Comm** | GP1 | GP1 | TRRS serial connection |
 | **Hand Detection** | GP16→GND | GP16 (float) | **Critical configuration** |
 | **USB Power** | Native | - | Left half only |
@@ -326,10 +326,11 @@ The firmware works out-of-the-box with the split wiring described in [WIRING_GUI
 
 #### Firmware Implementation Details
 - **Automatic Hand Detection**: The firmware reads GP16 at startup to determine left vs right half
-- **Matrix Scanning**: Left half scans columns 0-2 (GP9-GP11), right half scans columns 3-5 (GP12-GP14)
+- **Independent Matrix Scanning**: Each half scans its own complete 3x7 matrix independently
 - **Serial Communication**: Both halves use GP1 for UART communication over TRRS cable
 - **Power Management**: Left half supplies 3.3V to right half via TRRS Ring 2
 - **Peripheral Handling**: PMW3360 and encoder are only active on the right half
+- **No Shared Pins**: Each half is completely independent with dedicated row and column pins
 
 #### Validation
 Run these commands to verify your configuration:

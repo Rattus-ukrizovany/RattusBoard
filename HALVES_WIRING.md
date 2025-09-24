@@ -24,7 +24,7 @@ Left Half (Master)                    Right Half (Slave)
 │    [USB-C INPUT]    │              │                     │
 │  Raspberry Pi Pico  │◄─── TRRS ───►│  Raspberry Pi Pico  │
 │                     │              │                     │
-│  Matrix: 3×7        │              │  Matrix: 3×7        │
+│  INDEPENDENT 3×7    │              │  INDEPENDENT 3×7    │
 │  Cols: GP9-GP11     │              │  Cols: GP12-GP14    │
 │  Rows: GP2-GP8      │              │  Rows: GP2-GP8      │
 │                     │              │                     │
@@ -41,12 +41,17 @@ Left Half (Master)                    Right Half (Slave)
      (USB Connected)                    (TRRS Powered)
 ```
 
+**FULLY INDEPENDENT DESIGN:**
+- **NO SHARED MATRIX PINS** - Each half has its own dedicated rows and columns
+- **Independent Scanning** - Each microcontroller only manages its own 3×7 matrix
+- **TRRS Communication** - Only for coordination between halves via GP1
+
 **Signal Flow:**
 ```
 Computer ──USB-C──► Left Pico ──TRRS──► Right Pico
                         │                    │
                    Matrix 3×7           Matrix 3×7
-                   (Cols 0-2)          (Cols 3-5→0-2)
+                 (Independent)        (Independent)
                                            │
                                     ┌─────────────┐
                                     │ PMW3360     │
@@ -543,18 +548,18 @@ qmk console
 | TRRS Serial | GP1 | GP1 | Bidirectional |
 | Hand Detection | GP16 → GND | GP16 (float) | Critical! |
 | Status LED | GP25 | - | Optional |
-| **Matrix (Rows)** |
-| Row 0 | GP2 | GP2 | Shared names |
-| Row 1 | GP3 | GP3 | Shared names |
-| Row 2 | GP4 | GP4 | Shared names |
-| Row 3 | GP5 | GP5 | Shared names |
-| Row 4 | GP6 | GP6 | Shared names |
-| Row 5 | GP7 | GP7 | Shared names |
-| Row 6 (Thumbs) | GP8 | GP8 | Shared names |
-| **Matrix (Columns)** |
-| Column 0 | GP9 | GP12 | Local numbering |
-| Column 1 | GP10 | GP13 | Local numbering |
-| Column 2 | GP11 | GP14 | Local numbering |
+| **Matrix (Rows) - INDEPENDENT** |
+| Row 0 | GP2 | GP2 | **Independent pins** |
+| Row 1 | GP3 | GP3 | **Independent pins** |
+| Row 2 | GP4 | GP4 | **Independent pins** |
+| Row 3 | GP5 | GP5 | **Independent pins** |
+| Row 4 | GP6 | GP6 | **Independent pins** |
+| Row 5 | GP7 | GP7 | **Independent pins** |
+| Row 6 (Thumbs) | GP8 | GP8 | **Independent pins** |
+| **Matrix (Columns) - INDEPENDENT** |
+| Column 0 | GP9 | GP12 | **Fully independent** |
+| Column 1 | GP10 | GP13 | **Fully independent** |
+| Column 2 | GP11 | GP14 | **Fully independent** |
 | **Trackball (SPI)** |
 | CS (Chip Select) | - | GP17 | SPI control |
 | SCK (Serial Clock) | - | GP18 | SPI clock |
@@ -570,9 +575,12 @@ qmk console
 
 **Config.h Verification:**
 ```c
-// Matrix configuration
+// Matrix configuration - INDEPENDENT HALVES
+#define MATRIX_ROWS 7
+#define MATRIX_COLS 3  // Only 3 columns per half
+
 #define MATRIX_ROW_PINS { GP2, GP3, GP4, GP5, GP6, GP7, GP8 }
-#define MATRIX_COL_PINS { GP9, GP10, GP11, GP12, GP13, GP14 }
+#define MATRIX_COL_PINS { GP9, GP10, GP11 }  // Left half pins only
 #define DIODE_DIRECTION COL2ROW
 
 // Split configuration  
@@ -580,20 +588,30 @@ qmk console
 #define SPLIT_HAND_PIN_LOW_IS_LEFT  // GP16→GND = Left
 #define SOFT_SERIAL_PIN GP1
 
-// PMW3360 configuration
+// PMW3360 configuration (right half only)
 #define PMW3360_CS_PIN GP17
 #define SPI_SCK_PIN GP18
 #define SPI_MOSI_PIN GP19  
 #define SPI_MISO_PIN GP20
 
-// Encoder configuration
+// Encoder configuration (right half only)
 #define ENCODERS_PAD_A { GP21 }
 #define ENCODERS_PAD_B { GP22 }
 ```
 
 **Matrix.c Logic:**
 ```c
-// Left half: scan columns 0-2 (GP9-GP11)
+// Each half scans its own independent 3x7 matrix
+// No column offset logic needed - fully independent
+for (uint8_t col = 0; col < MATRIX_COLS; col++) {
+    // Scan all 3 columns on this half only
+}
+```
+
+**Key Changes:**
+- **MATRIX_COLS = 3** (not 6) - each half is independent
+- **No shared pins** - each half manages its own matrix completely
+- **Simplified scanning** - no column offset logic needed
 if (isLeftHand) {
     col_start = 0;
     col_end = MATRIX_COLS / 2;  // Columns 0-2
