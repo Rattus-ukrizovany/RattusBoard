@@ -1,0 +1,96 @@
+name: Build RattusBoard Firmware
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'keyboards/rattusboard/**'
+      - '.github/workflows/firmware-build.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'keyboards/rattusboard/**'
+      - '.github/workflows/firmware-build.yml'
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+        
+    - name: Install QMK CLI
+      run: |
+        python3 -m pip install --upgrade pip
+        pip3 install qmk
+        
+    - name: Setup QMK
+      run: |
+        qmk setup -y -H ${{ github.workspace }}/qmk_firmware
+        
+    - name: Copy keyboard files to QMK
+      run: |
+        cp -r keyboards/rattusboard ${{ github.workspace }}/qmk_firmware/keyboards/
+        
+    - name: List keyboard files (debug)
+      run: |
+        ls -la ${{ github.workspace }}/qmk_firmware/keyboards/rattusboard/
+        
+    - name: Compile firmware
+      run: |
+        cd ${{ github.workspace }}/qmk_firmware
+        qmk compile -kb rattusboard -km default
+        
+    - name: Find and rename firmware file
+      run: |
+        cd ${{ github.workspace }}/qmk_firmware
+        # Find the generated .uf2 file
+        FIRMWARE_FILE=$(find . -name "rattusboard_default.uf2" -type f | head -1)
+        if [ -n "$FIRMWARE_FILE" ]; then
+          echo "Found firmware file: $FIRMWARE_FILE"
+          # Copy to a standard location with versioned name
+          mkdir -p ${{ github.workspace }}/firmware
+          if [ "${{ github.event_name }}" == "release" ]; then
+            cp "$FIRMWARE_FILE" ${{ github.workspace }}/firmware/rattusboard_${{ github.event.release.tag_name }}.uf2
+            cp "$FIRMWARE_FILE" ${{ github.workspace }}/firmware/rattusboard_latest.uf2
+          else
+            # For non-release builds, use commit SHA
+            SHORT_SHA=$(echo ${{ github.sha }} | cut -c1-7)
+            cp "$FIRMWARE_FILE" ${{ github.workspace }}/firmware/rattusboard_${SHORT_SHA}.uf2
+            cp "$FIRMWARE_FILE" ${{ github.workspace }}/firmware/rattusboard_latest.uf2
+          fi
+          ls -la ${{ github.workspace }}/firmware/
+        else
+          echo "ERROR: Firmware file not found!"
+          find . -name "*.uf2" -type f
+          exit 1
+        fi
+        
+    - name: Upload firmware artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: rattusboard-firmware
+        path: firmware/
+        retention-days: 90
+        
+    - name: Upload firmware to release
+      if: github.event_name == 'release'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: firmware/rattusboard_${{ github.event.release.tag_name }}.uf2
+        asset_name: rattusboard_${{ github.event.release.tag_name }}.uf2
+        asset_content_type: application/octet-stream
