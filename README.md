@@ -496,6 +496,32 @@ We welcome contributions to make RattusBoard even better! Here's how you can hel
 5. **Test Thoroughly**: Verify changes work as expected
 6. **Submit PR**: Create pull request with detailed description
 
+### Automated Firmware Builds
+
+The repository includes GitHub Actions automation for firmware building:
+
+#### 🔄 **Continuous Integration**
+- **Pull Request Builds**: Every PR automatically builds firmware to catch issues early
+- **Main Branch Builds**: Commits to main trigger development builds
+- **Release Builds**: Tagged releases automatically build and attach firmware files
+
+#### 📦 **Build Artifacts**
+- **PR/Development Builds**: Available as workflow artifacts for 90 days
+- **Release Builds**: Permanently attached to GitHub releases
+- **Latest Build**: Always available as `rattusboard_latest.uf2`
+
+#### 🛠️ **Local Development**
+```bash
+# Validate keyboard configuration
+python3 -m json.tool keyboards/rattusboard/info.json
+
+# Check required files
+ls keyboards/rattusboard/{config.h,rules.mk,info.json,rattusboard.{h,c}}
+
+# Test with QMK (requires QMK setup)
+qmk compile -kb rattusboard -km default
+```
+
 ### Code Standards
 
 - Follow QMK coding conventions

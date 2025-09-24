@@ -10,6 +10,8 @@
 build/
 .build/
 obj_*/
+qmk_firmware/
+firmware/
 
 # Temporary files
 *.tmp
