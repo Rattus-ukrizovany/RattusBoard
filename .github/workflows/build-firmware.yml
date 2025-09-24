@@ -109,30 +109,53 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG="auto-latest"
-          RELEASE_NAME="Automated Firmware Release"
+          RELEASE_NAME="Latest Firmware (Auto-Built)"
+          TARGET_FILENAME="rattusboard_default.uf2"
+          
+          # Find the UF2 file in artifacts
           UF2_FILE=$(find ./artifacts -name '*.uf2' | head -n 1)
           
           if [ -z "$UF2_FILE" ]; then
             echo "No UF2 file found in artifacts. Available files:"
             ls -la ./artifacts/
-            echo "Creating release anyway with available artifacts..."
+            echo "Looking for any firmware file as fallback..."
             # Find any firmware file as fallback
             FIRMWARE_FILE=$(find ./artifacts -type f | head -n 1)
             if [ -n "$FIRMWARE_FILE" ]; then
               UF2_FILE="$FIRMWARE_FILE"
+              echo "Warning: Using non-UF2 file: $UF2_FILE"
             else
-              echo "No firmware files found at all. Exiting."
+              echo "Error: No firmware files found at all."
               exit 1
             fi
           fi
           
-          echo "Using firmware file: $UF2_FILE"
+          echo "Found firmware file: $UF2_FILE"
+          
+          # Copy to expected filename for consistency with documentation
+          if [ "$(basename "$UF2_FILE")" != "$TARGET_FILENAME" ]; then
+            echo "Renaming firmware file to $TARGET_FILENAME for consistency..."
+            cp "$UF2_FILE" "./artifacts/$TARGET_FILENAME"
+            UF2_FILE="./artifacts/$TARGET_FILENAME"
+          fi
+          
+          # Create simple release notes
+          SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-7)
+          BRANCH_NAME=$(echo ${GITHUB_REF#refs/heads/})
+          BUILD_DATE=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+          
+          RELEASE_NOTES="Automated firmware build from commit $SHORT_SHA on branch $BRANCH_NAME (built $BUILD_DATE). Download rattusboard_default.uf2 below and flash to both keyboard halves."
           
           # Check if release exists and create/update accordingly
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo "Release $TAG exists, uploading firmware..."
+            echo "Release $TAG exists, updating with new firmware..."
             gh release upload "$TAG" "$UF2_FILE" --repo "$GITHUB_REPOSITORY" --clobber
+            echo "Updating release notes..."
+            gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --notes "$RELEASE_NOTES"
           else
             echo "Creating new release $TAG..."
-            gh release create "$TAG" "$UF2_FILE" --repo "$GITHUB_REPOSITORY" --title "$RELEASE_NAME" --notes "Automated build from commit $GITHUB_SHA"
+            gh release create "$TAG" "$UF2_FILE" --repo "$GITHUB_REPOSITORY" --title "$RELEASE_NAME" --notes "$RELEASE_NOTES"
           fi
+          
+          echo "✅ Release updated successfully!"
+          echo "🔗 Download URL: https://github.com/$GITHUB_REPOSITORY/releases/download/$TAG/$TARGET_FILENAME"
