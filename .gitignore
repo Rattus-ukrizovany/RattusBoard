@@ -1,0 +1,49 @@
+# Build artifacts
+*.o
+*.hex
+*.uf2
+*.bin
+*.elf
+*.map
+
+# QMK build files
+build/
+.build/
+obj_*/
+
+# Temporary files
+*.tmp
+*.temp
+*~
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Log files
+*.log
+
+# Node modules (if using any JS tools)
+node_modules/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Backup files
+*.bak
+*.backup
+
+# OS generated files
+.directory
+*.lnk
+
+# Personal configuration files
+personal/
+private/
+secrets/
