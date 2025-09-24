@@ -59,7 +59,9 @@
  * Rotary Encoder Configuration (Mouse Wheel)
  * Connected to right half for scroll wheel functionality
  */
-// Note: ENCODERS_PAD_A and ENCODERS_PAD_B defined in keyboard.json
+#define ENCODERS_PAD_A { GP26 }
+#define ENCODERS_PAD_B { GP27 }
+#define ENCODER_RESOLUTION 4
 
 /*
  * Feature flags
@@ -74,7 +76,7 @@
  */
 #define RP2040_BOOTLOADER_DOUBLE_TAP_RESET
 #define RP2040_BOOTLOADER_DOUBLE_TAP_RESET_TIMEOUT 200U
-#define RP2040_BOOTLOADER_DOUBLE_TAP_RESET_LED GP25
+#define RP2040_BOOTLOADER_DOUBLE_TAP_RESET_LED GP28
 
 /* 
  * Advanced features

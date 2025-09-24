@@ -8,9 +8,10 @@
 
 This guide provides comprehensive wiring instructions for the RattusBoard split keyboard. **Each half is fully independent with dedicated pins** - there are no shared matrix connections between halves.
 
-**Key Design Principle: FULLY INDEPENDENT HALVES**
-- Each half has its own complete 3×7 matrix
-- No shared row or column pins between halves
+**Key Design Principle: NEW 4×6 MATRIX LAYOUT**
+- Each half has its own complete 4×6 matrix (3 main rows + 1 thumb row)
+- 42 total keys (21 per half)
+- Thumb cluster arrangement: Left (cols 3,4,5), Right (cols 0,1,2)
 - Communication only via TRRS cable for coordination
 - Each microcontroller manages its own hardware completely
 
@@ -24,22 +25,22 @@ The left half serves as the master controller and handles USB communication with
 
 ### Matrix Connections
 
-**Row Pins (GP2-GP8):**
+**Row Pins (GP2-GP5) - New 4×6 Layout:**
 ```
 Row 0: GP2  → Connect to all switches in row 0 (top row)
 Row 1: GP3  → Connect to all switches in row 1
-Row 2: GP4  → Connect to all switches in row 2
-Row 3: GP5  → Connect to all switches in row 3
-Row 4: GP6  → Connect to all switches in row 4
-Row 5: GP7  → Connect to all switches in row 5
-Row 6: GP8  → Connect to all switches in row 6 (thumb cluster)
+Row 2: GP4  → Connect to all switches in row 2  
+Row 3: GP5  → Connect to all switches in row 3 (thumb cluster)
 ```
 
-**Column Pins (GP9-GP11):**
+**Column Pins (GP9-GP14) - New 4×6 Layout:**
 ```
-Col 0: GP9  → Connect to all switches in column 0 (leftmost)
-Col 1: GP10 → Connect to all switches in column 1 (middle)
-Col 2: GP11 → Connect to all switches in column 2 (rightmost)
+Col 0: GP9  → Connect to all switches in column 0
+Col 1: GP10 → Connect to all switches in column 1
+Col 2: GP11 → Connect to all switches in column 2
+Col 3: GP12 → Connect to all switches in column 3 (includes thumbs)
+Col 4: GP13 → Connect to all switches in column 4 (includes thumbs)
+Col 5: GP14 → Connect to all switches in column 5 (includes thumbs)
 ```
 
 ### Split Communication
@@ -56,7 +57,7 @@ NC   → TRRS Sleeve (Not connected)
 
 **Split Detection Pin:**
 ```
-GP16 → Connect to GND (this identifies the left half)
+GP21 → Connect to GND (this identifies the left half)
 ```
 
 ### Power and USB
@@ -80,15 +81,15 @@ GP25 → Status LED (optional)
 | GP2 | Row 0 | Matrix Row 0 |
 | GP3 | Row 1 | Matrix Row 1 |
 | GP4 | Row 2 | Matrix Row 2 |
-| GP5 | Row 3 | Matrix Row 3 |
-| GP6 | Row 4 | Matrix Row 4 |
-| GP7 | Row 5 | Matrix Row 5 |
-| GP8 | Row 6 | Matrix Row 6 (thumb) |
+| GP5 | Row 3 | Matrix Row 3 (thumb) |
 | GP9 | Col 0 | Matrix Column 0 |
 | GP10 | Col 1 | Matrix Column 1 |
 | GP11 | Col 2 | Matrix Column 2 |
-| GP16 | Hand Detect | GND (Left ID) |
-| GP25 | Status LED | LED (optional) |
+| GP12 | Col 3 | Matrix Column 3 (includes thumbs) |
+| GP13 | Col 4 | Matrix Column 4 (includes thumbs) |
+| GP14 | Col 5 | Matrix Column 5 (includes thumbs) |
+| GP21 | Hand Detect | GND (Left ID) |
+| GP28 | Status LED | LED (optional) |
 | 3.3V | Power Out | TRRS Ring 2 |
 | GND | Ground | TRRS Ring 1 |
 
@@ -100,22 +101,22 @@ The right half serves as the slave controller and includes the trackball sensor 
 
 ### Matrix Connections
 
-**Row Pins (GP2-GP8) - Same as Left:**
+**Row Pins (GP2-GP5) - New 4×6 Layout:**
 ```
 Row 0: GP2  → Connect to all switches in row 0 (top row)
 Row 1: GP3  → Connect to all switches in row 1
 Row 2: GP4  → Connect to all switches in row 2
-Row 3: GP5  → Connect to all switches in row 3
-Row 4: GP6  → Connect to all switches in row 4
-Row 5: GP7  → Connect to all switches in row 5
-Row 6: GP8  → Connect to all switches in row 6 (thumb cluster)
+Row 3: GP5  → Connect to all switches in row 3 (thumb cluster)
 ```
 
-**Column Pins (GP12-GP14):**
+**Column Pins (GP15-GP20) - New 4×6 Layout:**
 ```
-Col 3: GP12 → Connect to all switches in column 0 (leftmost on right half)
-Col 4: GP13 → Connect to all switches in column 1 (middle on right half)
-Col 5: GP14 → Connect to all switches in column 2 (rightmost on right half)
+Col 0: GP15 → Connect to all switches in column 0 (includes thumbs)
+Col 1: GP16 → Connect to all switches in column 1 (includes thumbs) 
+Col 2: GP17 → Connect to all switches in column 2 (includes thumbs)
+Col 3: GP18 → Connect to all switches in column 3
+Col 4: GP19 → Connect to all switches in column 4
+Col 5: GP20 → Connect to all switches in column 5
 ```
 
 ### Split Communication
@@ -132,17 +133,17 @@ NC   → TRRS Sleeve (Not connected)
 
 **Split Detection Pin:**
 ```
-GP16 → Leave floating/unconnected (this identifies the right half)
+GP21 → Leave floating/unconnected (this identifies the right half)
 ```
 
 ### PMW3360 Trackball Sensor
 
 **SPI Interface:**
 ```
-GP17 → CS (Chip Select)
-GP18 → SCK (Serial Clock)
-GP19 → MOSI (Master Out Slave In)
-GP20 → MISO (Master In Slave Out)
+GP22 → CS (Chip Select)
+GP23 → SCK (Serial Clock)
+GP24 → MOSI (Master Out Slave In)
+GP25 → MISO (Master In Slave Out)
 3.3V → VCC (Power)
 GND  → GND (Ground)
 ```
@@ -157,8 +158,8 @@ GP23 → Motion pin (optional, for motion detection)
 
 **Encoder Connections:**
 ```
-GP21 → Encoder Pin A (quadrature signal A)
-GP22 → Encoder Pin B (quadrature signal B)
+GP26 → Encoder Pin A (quadrature signal A)
+GP27 → Encoder Pin B (quadrature signal B)
 GND  → Encoder Common/Ground
 ```
 
@@ -176,22 +177,22 @@ GND  → Encoder switch ground
 | GP2 | Row 0 | Matrix Row 0 |
 | GP3 | Row 1 | Matrix Row 1 |
 | GP4 | Row 2 | Matrix Row 2 |
-| GP5 | Row 3 | Matrix Row 3 |
-| GP6 | Row 4 | Matrix Row 4 |
-| GP7 | Row 5 | Matrix Row 5 |
-| GP8 | Row 6 | Matrix Row 6 (thumb) |
-| GP12 | Col 3 | Matrix Column 0 |
-| GP13 | Col 4 | Matrix Column 1 |
-| GP14 | Col 5 | Matrix Column 2 |
-| GP16 | Hand Detect | Floating (Right ID) |
-| GP17 | PMW3360 CS | Trackball Chip Select |
-| GP18 | PMW3360 SCK | Trackball Serial Clock |
-| GP19 | PMW3360 MOSI | Trackball Data Out |
-| GP20 | PMW3360 MISO | Trackball Data In |
-| GP21 | Encoder A | Rotary Encoder Pin A |
-| GP22 | Encoder B | Rotary Encoder Pin B |
-| GP23 | PMW3360 Motion | Motion Detection (optional) |
-| GP24 | Encoder SW | Encoder Switch (optional) |
+| GP5 | Row 3 | Matrix Row 3 (thumb) |
+| GP15 | Col 0 | Matrix Column 0 (includes thumbs) |
+| GP16 | Col 1 | Matrix Column 1 (includes thumbs) |
+| GP17 | Col 2 | Matrix Column 2 (includes thumbs) |
+| GP18 | Col 3 | Matrix Column 3 |
+| GP19 | Col 4 | Matrix Column 4 |
+| GP20 | Col 5 | Matrix Column 5 |
+| GP21 | Hand Detect | Floating (Right ID) |
+| GP22 | PMW3360 CS | Trackball Chip Select |
+| GP23 | PMW3360 SCK | Trackball Serial Clock |
+| GP24 | PMW3360 MOSI | Trackball Data Out |
+| GP25 | PMW3360 MISO | Trackball Data In |
+| GP26 | Encoder A | Rotary Encoder Pin A |
+| GP27 | Encoder B | Rotary Encoder Pin B |
+| GP28 | Encoder SW | Encoder Switch (optional) |
+| GP29 | PMW3360 Motion | Motion Detection (optional) |
 | 3.3V | Power In | TRRS Ring 2 |
 | GND | Ground | TRRS Ring 1 |
 
