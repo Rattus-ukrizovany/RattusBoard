@@ -6,7 +6,13 @@
 
 ## 📋 Overview
 
-This guide provides comprehensive wiring instructions for the RattusBoard split keyboard. Each half has specific pin assignments and peripheral connections that must be followed exactly for proper operation.
+This guide provides comprehensive wiring instructions for the RattusBoard split keyboard. **Each half is fully independent with dedicated pins** - there are no shared matrix connections between halves.
+
+**Key Design Principle: FULLY INDEPENDENT HALVES**
+- Each half has its own complete 3×7 matrix
+- No shared row or column pins between halves
+- Communication only via TRRS cable for coordination
+- Each microcontroller manages its own hardware completely
 
 **Important:** Both halves use the same firmware but are differentiated through hardware-based hand detection.
 

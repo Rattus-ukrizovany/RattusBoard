@@ -9,11 +9,12 @@
 /*
  * Custom matrix implementation for RattusBoard
  * 
- * This implements the 6x7 matrix scanning for the split keyboard.
+ * This implements independent 3x7 matrix scanning for each split half.
  * The matrix is organized as:
- * - 6 columns total (3 per half)
- * - 7 rows total (shared between halves)
+ * - 3 columns per half (fully independent)
+ * - 7 rows per half (fully independent) 
  * - Diodes are COL2ROW
+ * - Each half only scans its own pins
  */
 
 #ifndef DEBOUNCE
@@ -61,18 +62,9 @@ void matrix_init_custom(void) {
 bool matrix_scan_custom(matrix_row_t current_matrix[]) {
     bool changed = false;
     
-    // Determine which columns to scan based on split half
-    uint8_t col_start, col_end;
-    if (isLeftHand) {
-        col_start = MATRIX_COLS / 2;
-        col_end = MATRIX_COLS;      // Scan columns 3-5 for left half (slave)
-    } else {
-        col_start = 0;
-        col_end = MATRIX_COLS / 2;  // Scan columns 0-2 for right half (master)
-    }
-    
-    // Scan the matrix
-    for (uint8_t col = col_start; col < col_end; col++) {
+    // Each half only scans its own 3 columns
+    // No column offset needed - each half is fully independent
+    for (uint8_t col = 0; col < MATRIX_COLS; col++) {
         // Select column
         writePinLow(col_pins[col]);
         
