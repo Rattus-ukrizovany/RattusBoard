@@ -1,0 +1,196 @@
+name: Build RattusBoard Split Firmware
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'keyboards/rattusboard/**'
+      - '.github/workflows/split-firmware-build.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'keyboards/rattusboard/**'
+      - '.github/workflows/split-firmware-build.yml'
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  build-split-firmware:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        side: [left, right]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+        
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+        
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y git python3-pip gcc-arm-none-eabi
+        
+    - name: Install QMK CLI
+      run: |
+        python3 -m pip install --upgrade pip
+        pip3 install qmk
+        
+    - name: Setup QMK environment
+      run: |
+        export QMK_HOME="${{ github.workspace }}/qmk_firmware"
+        qmk setup -y -H "$QMK_HOME"
+        
+    - name: Copy keyboard files to QMK
+      run: |
+        cp -r keyboards/rattusboard ${{ github.workspace }}/qmk_firmware/keyboards/
+        
+    - name: Configure for rp2040_pro_micro and split side
+      run: |
+        cd ${{ github.workspace }}/qmk_firmware/keyboards/rattusboard
+        
+        # Create converter-specific configuration
+        echo "Creating rp2040_pro_micro configuration..."
+        
+        # Backup original files
+        cp keyboard.json keyboard.json.backup
+        cp rules.mk rules.mk.backup
+        
+        # Update keyboard.json for rp2040_pro_micro
+        python3 << 'EOF'
+        import json
+        
+        # Load the keyboard configuration
+        with open('keyboard.json', 'r') as f:
+            config = json.load(f)
+        
+        # Update for rp2040_pro_micro converter
+        config['processor'] = 'RP2040'
+        config['bootloader'] = 'rp2040'
+        
+        # Save the updated configuration
+        with open('keyboard.json', 'w') as f:
+            json.dump(config, f, indent=4)
+        EOF
+        
+        # Update rules.mk for rp2040_pro_micro
+        sed -i 's/MCU = RP2040/CONVERT_TO = rp2040_pro_micro/' rules.mk
+        
+        echo "Updated configuration for rp2040_pro_micro"
+        echo "Updated keyboard.json:"
+        cat keyboard.json | head -50
+        echo "Updated rules.mk:"
+        cat rules.mk | head -20
+        
+    - name: Create split-specific keymap
+      run: |
+        cd ${{ github.workspace }}/qmk_firmware/keyboards/rattusboard
+        
+        # Create a split-specific keymap directory
+        mkdir -p keymaps/split_${{ matrix.side }}
+        cp -r keymaps/default/* keymaps/split_${{ matrix.side }}/
+        
+        # Add split-specific configuration to keymap config.h
+        cat > keymaps/split_${{ matrix.side }}/config.h << 'EOF'
+        // Split-specific configuration for ${{ matrix.side }} side
+        #pragma once
+        
+        // Force hand assignment for this build
+        #ifdef SPLIT_HAND_PIN
+        #undef SPLIT_HAND_PIN
+        #endif
+        
+        #ifdef SPLIT_HAND_PIN_LOW_IS_LEFT
+        #undef SPLIT_HAND_PIN_LOW_IS_LEFT
+        #endif
+        
+        // Enable split keyboard features
+        #define SPLIT_KEYBOARD
+        #define SPLIT_USB_DETECT
+        EOF
+        
+        # Add side-specific defines
+        if [ "${{ matrix.side }}" = "left" ]; then
+          echo "#define SPLIT_HAND_MATRIX_GRID GP2, GP9  // Left hand" >> keymaps/split_${{ matrix.side }}/config.h
+          echo "#define MASTER_LEFT" >> keymaps/split_${{ matrix.side }}/config.h
+        else
+          echo "#define SPLIT_HAND_MATRIX_GRID GP2, GP12  // Right hand" >> keymaps/split_${{ matrix.side }}/config.h
+          echo "#define MASTER_RIGHT" >> keymaps/split_${{ matrix.side }}/config.h
+        fi
+        
+        echo "Created split-specific keymap for ${{ matrix.side }} side"
+        cat keymaps/split_${{ matrix.side }}/config.h
+        
+    - name: Compile firmware for ${{ matrix.side }} side
+      run: |
+        cd ${{ github.workspace }}/qmk_firmware
+        echo "Compiling firmware for ${{ matrix.side }} side..."
+        
+        # Set environment variables for split compilation
+        export SPLIT_KEYBOARD=yes
+        export TARGET_SIDE=${{ matrix.side }}
+        
+        # Compile the firmware
+        qmk compile -kb rattusboard -km split_${{ matrix.side }} -e CONVERT_TO=rp2040_pro_micro -v
+        
+    - name: Find and prepare firmware files
+      run: |
+        cd ${{ github.workspace }}/qmk_firmware
+        echo "Searching for compiled firmware files..."
+        find . -name "*.uf2" -type f -ls
+        
+        # Create firmware output directory
+        mkdir -p ${{ github.workspace }}/firmware
+        
+        # Find the generated .uf2 file
+        FIRMWARE_FILE=$(find . -name "rattusboard_split_${{ matrix.side }}.uf2" -type f | head -1)
+        if [ -z "$FIRMWARE_FILE" ]; then
+          FIRMWARE_FILE=$(find . -name "*rattusboard*.uf2" -type f | head -1)
+        fi
+        if [ -z "$FIRMWARE_FILE" ]; then
+          FIRMWARE_FILE=$(find . -name "*.uf2" -type f | head -1)
+        fi
+        
+        if [ -n "$FIRMWARE_FILE" ]; then
+          echo "Found firmware file: $FIRMWARE_FILE"
+          
+          # Copy and rename firmware with the specific naming convention
+          cp "$FIRMWARE_FILE" ${{ github.workspace }}/firmware/rattusboard_${{ matrix.side }}-rp2040_pro_micro-firmware.uf2
+          
+          echo "Created firmware file: rattusboard_${{ matrix.side }}-rp2040_pro_micro-firmware.uf2"
+          
+          # Calculate file size and checksum
+          FIRMWARE_PATH="${{ github.workspace }}/firmware/rattusboard_${{ matrix.side }}-rp2040_pro_micro-firmware.uf2"
+          echo "File size: $(stat -c%s "$FIRMWARE_PATH") bytes"
+          echo "SHA256: $(sha256sum "$FIRMWARE_PATH" | cut -d' ' -f1)"
+          
+        else
+          echo "ERROR: No firmware file found!"
+          echo "Available files:"
+          find . -name "*.uf2" -o -name "*.bin" -o -name "*.hex" -type f -ls
+          exit 1
+        fi
+        
+    - name: Upload firmware artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: rattusboard_${{ matrix.side }}-rp2040_pro_micro-firmware
+        path: firmware/rattusboard_${{ matrix.side }}-rp2040_pro_micro-firmware.uf2
+        retention-days: 90
+        
+    - name: Upload firmware to release (if release)
+      if: github.event_name == 'release'
+      uses: softprops/action-gh-release@v1
+      with:
+        files: firmware/rattusboard_${{ matrix.side }}-rp2040_pro_micro-firmware.uf2
+        tag_name: ${{ github.event.release.tag_name }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
