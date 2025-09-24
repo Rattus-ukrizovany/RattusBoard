@@ -18,7 +18,7 @@
  * Keyboard Matrix Assignments (Raspberry Pi Pico / RP2040)
  * 
  * The matrix is configured as 6x7 for Corne-style layout
- * Left half uses columns 0-2, right half uses columns 3-5
+ * Left half uses columns 3-5, right half uses columns 0-2
  * 
  * Row pins (shared between halves):
  */

@@ -247,7 +247,7 @@ keyboards/rattusboard/
 2. **Resistors**: Install pull-up resistors for I2C communication
 3. **Capacitors**: Add decoupling capacitors near power pins
 4. **TRRS Jacks**: Mount communication connectors
-5. **USB-C**: Install on master half only
+5. **USB-C**: Install on right half (master) only
 
 #### Phase 3: Microcontroller Installation
 1. **Socket Installation** (recommended): Install mill-max sockets
