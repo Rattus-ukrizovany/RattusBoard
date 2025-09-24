@@ -78,7 +78,6 @@ RattusBoard is a cutting-edge split ergonomic keyboard designed for productivity
 
 This section provides essential wiring information for the RattusBoard split keyboard. For comprehensive assembly instructions, troubleshooting, and detailed diagrams, see the **[detailed wiring guide](HALVES_WIRING.md)**.
 
-#### 🔍 Quick Overview
 
 ```
 Left Half (Master)              Right Half (Slave)
@@ -106,13 +105,6 @@ Left Half (Master)              Right Half (Slave)
 | **Trackball SPI** | - | GP17-GP20 | Right half only |
 | **Encoder** | - | GP21-GP22 | Right half only |
 
-#### ⚠️ Critical Requirements
-
-- **Diode Orientation**: COL2ROW (cathode band toward row pins)
-- **Hand Detection**: LEFT half GP16→GND, RIGHT half GP16 floating
-- **TRRS Cable**: 4-conductor cable required (not 3-conductor TRS)
-- **Power Flow**: USB → Left half → TRRS → Right half
-- **Testing**: Verify each half independently before connecting together
 
 #### 🔧 Quick Assembly Steps
 
@@ -188,7 +180,7 @@ keyboards/rattusboard/
 2. **Resistors**: Install pull-up resistors for I2C communication
 3. **Capacitors**: Add decoupling capacitors near power pins
 4. **TRRS Jacks**: Mount communication connectors
-5. **USB-C**: Install on master half only
+5. **USB-C**: Install on right half (master) only
 
 #### Phase 3: Microcontroller Installation
 1. **Socket Installation** (recommended): Install mill-max sockets
@@ -356,7 +348,7 @@ Layer 0 (Base):
 └─────┴─────┴─────┼─────┼─────┼─────┤   ├─────┼─────┼─────┼─────┴─────┴─────┘
                   │ GUI │ SPC │LOWER│   │RAISE│ ENT │ ALT │
                   └─────┴─────┴─────┘   └─────┴─────┴─────┘
-                           Trackball    Encoder
+                                         Trackball  Encoder
 ```
 
 ---

@@ -35,7 +35,7 @@ enum custom_keycodes {
  * └─────┴─────┴─────┼─────┼─────┼─────┤   ├─────┼─────┼─────┼─────┴─────┴─────┘
  *                   │ GUI │ SPC │LOWER│   │RAISE│ ENT │ ALT │
  *                   └─────┴─────┴─────┘   └─────┴─────┴─────┘
- *                         Trackball    Encoder (Scroll)
+ *                                         Trackball  Encoder (Scroll)
  */
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {

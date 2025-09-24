@@ -28,7 +28,7 @@
         "soft_serial_pin": "GP1",
         "handedness": {
             "pin": "GP16",
-            "low": "left"
+            "low": "right"
         },
         "matrix_pins": {
             "right": {
@@ -45,7 +45,7 @@
         }
     },
     "matrix_pins": {
-        "cols": ["GP9", "GP10", "GP11", "GP12", "GP13", "GP14"],
+        "cols": ["GP12", "GP13", "GP14", "GP9", "GP10", "GP11"],
         "rows": ["GP2", "GP3", "GP4", "GP5", "GP6", "GP7", "GP8"]
     },
     "diode_direction": "COL2ROW",
