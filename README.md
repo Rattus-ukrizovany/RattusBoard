@@ -184,6 +184,57 @@ GP25 → Status LED (optional)
 - Use flux for all solder joints
 - Test each half independently before connecting
 
+### 🧪 Testing the Firmware
+
+To verify that the firmware compiles correctly, you can test it without actual hardware:
+
+```bash
+# Install QMK CLI (if not already installed)
+pip3 install qmk
+
+# Setup QMK environment
+qmk setup
+
+# Copy the RattusBoard files to your QMK installation
+cp -r keyboards/rattusboard ~/.local/share/qmk/keyboards/
+
+# Test compilation
+qmk compile -kb rattusboard -km default
+
+# The compilation should complete without errors and produce a .uf2 file
+```
+
+**Expected Output:** The compilation should complete successfully and generate `rattusboard_default.uf2` ready for flashing to the Raspberry Pi Pico.
+
+### 📚 Firmware Structure
+
+```
+keyboards/rattusboard/
+├── config.h              # Hardware configuration and pin assignments
+├── rules.mk              # Build configuration and feature flags
+├── info.json             # Physical layout and keyboard metadata
+├── vial.json             # VIAL compatibility configuration
+├── rattusboard.h         # Layout definitions and custom keycodes
+├── rattusboard.c         # Main keyboard implementation
+├── matrix.c              # Custom matrix scanning for split keyboard
+├── halconf.h             # HAL configuration for RP2040
+├── mcuconf.h             # MCU configuration for SPI support
+└── keymaps/
+    └── default/
+        └── keymap.c       # Default 4-layer keymap
+```
+
+### 🎯 Key Features Implemented
+
+- ✅ **Split Keyboard Support**: Full split keyboard functionality with TRRS communication
+- ✅ **PMW3360 Trackball**: High-precision optical sensor with configurable DPI
+- ✅ **Rotary Encoder**: Configured as scroll wheel with per-layer functions
+- ✅ **VIAL Compatibility**: Real-time keymap editing support
+- ✅ **Custom Matrix**: 6x7 matrix optimized for Corne-style layout
+- ✅ **RP2040 Support**: Full Raspberry Pi Pico compatibility
+- ✅ **4-Layer Layout**: Base, Lower, Raise, and Adjust layers
+- ✅ **Trackball Controls**: DPI adjustment and scroll mode toggle
+
 ### Assembly Steps
 
 #### Phase 1: PCB Preparation
