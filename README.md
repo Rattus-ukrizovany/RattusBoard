@@ -429,6 +429,28 @@ The firmware is automatically built and released using GitHub Actions:
 - ✅ **On main branch changes** - Development builds available as artifacts
 - ✅ **On pull requests** - Testing builds for validation
 
+#### 🔄 Split Keyboard Firmware Downloads
+The RattusBoard uses a split keyboard design requiring separate firmware files for each half. Both sides use the **rp2040_pro_micro** MCU target (implemented via QMK's `rp2040_ce` converter for RP2040 Pro Micro compatible boards).
+
+**Latest Build Artifacts:**
+- **[Left Side Firmware](https://github.com/Rattus-ukrizovany/RattusBoard/actions/workflows/split-firmware-build.yml)** - `rattusboard_left-rp2040_pro_micro-firmware`
+- **[Right Side Firmware](https://github.com/Rattus-ukrizovany/RattusBoard/actions/workflows/split-firmware-build.yml)** - `rattusboard_right-rp2040_pro_micro-firmware`
+
+**How to Download:**
+1. 🔗 **[Visit the Actions Page](https://github.com/Rattus-ukrizovany/RattusBoard/actions/workflows/split-firmware-build.yml)**
+2. 📋 Click on the latest **successful** workflow run
+3. 📦 Scroll down to **Artifacts** section
+4. ⬇️ Download both:
+   - `rattusboard_left-rp2040_pro_micro-firmware.uf2` (for left half)
+   - `rattusboard_right-rp2040_pro_micro-firmware.uf2` (for right half)
+
+**Important Notes:**
+- 🎯 **Both files are required** - one for each half of the split keyboard
+- ⚠️ **Flash the correct firmware to each side** - left firmware to left half, right firmware to right half
+- 🔄 **Artifacts are available for 90 days** after each build
+- 🏷️ **Release builds** permanently attach firmware files to GitHub releases
+- 💡 **Technical Note**: Uses QMK's `rp2040_ce` converter for RP2040 Pro Micro compatible boards
+
 #### What's Included
 - **Full QMK firmware** with Vial support
 - **4-layer default keymap** (Base, Lower, Raise, Adjust)
@@ -748,7 +770,8 @@ The repository includes GitHub Actions automation for firmware building:
 #### 📦 **Build Artifacts**
 - **PR/Development Builds**: Available as workflow artifacts for 90 days
 - **Release Builds**: Permanently attached to GitHub releases
-- **Latest Build**: Always available as `rattusboard_latest.uf2`
+- **Split Firmware**: Available as separate left/right artifacts (`rattusboard_left-rp2040_pro_micro-firmware` and `rattusboard_right-rp2040_pro_micro-firmware`)
+- **Legacy Build**: Also available as `rattusboard_latest.uf2` from existing workflows
 
 #### 🛠️ **Local Development**
 ```bash
