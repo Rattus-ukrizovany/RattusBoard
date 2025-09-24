@@ -94,18 +94,15 @@ jobs:
 
 
   release:
-    needs: build
+    needs: build-firmware
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Download build artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
-          name: firmware
+          name: rattusboard-firmware
           path: ./artifacts
-
-      - name: Set up GitHub CLI
-        uses: cli/gh-action@v2
 
       - name: Create or update GitHub Release and upload firmware
         env:
@@ -114,8 +111,28 @@ jobs:
           TAG="auto-latest"
           RELEASE_NAME="Automated Firmware Release"
           UF2_FILE=$(find ./artifacts -name '*.uf2' | head -n 1)
-          gh release view "$TAG" --repo "$GITHUB_REPOSITORY" || \
-            gh release create "$TAG" "$UF2_FILE" --repo "$GITHUB_REPOSITORY" --title "$RELEASE_NAME" --notes "Automated build from $GITHUB_SHA"
-          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY"; then
+          
+          if [ -z "$UF2_FILE" ]; then
+            echo "No UF2 file found in artifacts. Available files:"
+            ls -la ./artifacts/
+            echo "Creating release anyway with available artifacts..."
+            # Find any firmware file as fallback
+            FIRMWARE_FILE=$(find ./artifacts -type f | head -n 1)
+            if [ -n "$FIRMWARE_FILE" ]; then
+              UF2_FILE="$FIRMWARE_FILE"
+            else
+              echo "No firmware files found at all. Exiting."
+              exit 1
+            fi
+          fi
+          
+          echo "Using firmware file: $UF2_FILE"
+          
+          # Check if release exists and create/update accordingly
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $TAG exists, uploading firmware..."
             gh release upload "$TAG" "$UF2_FILE" --repo "$GITHUB_REPOSITORY" --clobber
+          else
+            echo "Creating new release $TAG..."
+            gh release create "$TAG" "$UF2_FILE" --repo "$GITHUB_REPOSITORY" --title "$RELEASE_NAME" --notes "Automated build from commit $GITHUB_SHA"
           fi
