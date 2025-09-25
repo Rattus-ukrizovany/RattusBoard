@@ -112,7 +112,7 @@ get_release_info() {
     
     # Check if API returned an error
     local error_msg
-    error_msg=$(echo "$response" | jq -r '.message // empty')
+    error_msg=$(printf "%s" "$response" | jq -r '.message // empty' 2>/dev/null || echo "")
     if [ -n "$error_msg" ]; then
         log_error "GitHub API error: $error_msg"
         return 1
@@ -131,10 +131,10 @@ list_firmware_files() {
     release_info=$(get_release_info "$tag") || return 1
     
     local release_name
-    release_name=$(echo "$release_info" | jq -r '.name')
+    release_name=$(printf "%s" "$release_info" | jq -r '.name // "Unknown Release"' 2>/dev/null || echo "Unknown Release")
     
     local assets
-    assets=$(echo "$release_info" | jq -r '.assets[] | select(.name | endswith(".uf2")) | "\(.name) (\(.size) bytes)"')
+    assets=$(printf "%s" "$release_info" | jq -r '.assets[]? | select(.name | endswith(".uf2"))? | "\(.name) (\(.size) bytes)" // empty' 2>/dev/null || echo "")
     
     echo
     log_success "Release: $release_name"
@@ -174,8 +174,22 @@ download_firmware_file() {
     release_info=$(get_release_info "$tag") || return 1
     
     # Find the download URL for the specified file
-    local download_url
-    download_url=$(echo "$release_info" | jq -r --arg filename "$filename" '.assets[] | select(.name == $filename) | .browser_download_url')
+    # Use the same approach as the list function which works
+    local download_url=""
+    
+    # Get all assets and then filter in bash instead of jq
+    local all_assets
+    all_assets=$(printf "%s" "$release_info" | jq -r '.assets[]? | "\(.name) \(.browser_download_url)"' 2>/dev/null || echo "")
+    
+    if [ -n "$all_assets" ]; then
+        # Find the line with our filename and extract the URL
+        download_url=$(echo "$all_assets" | grep "^${filename} " | cut -d' ' -f2- || echo "")
+    fi
+    
+    if [ "$VERBOSE" = true ]; then
+        log_info "Looking for filename: $filename"
+        log_info "Download URL found: $download_url"
+    fi
     
     if [ -z "$download_url" ] || [ "$download_url" = "null" ]; then
         log_error "Firmware file '$filename' not found in the latest release"
@@ -221,7 +235,7 @@ download_all_firmware() {
     
     # Get all .uf2 files
     local firmware_files
-    firmware_files=$(echo "$release_info" | jq -r '.assets[] | select(.name | endswith(".uf2")) | .name')
+    firmware_files=$(printf "%s" "$release_info" | jq -r '.assets[]? | select(.name | endswith(".uf2"))? | .name // empty' 2>/dev/null || echo "")
     
     if [ -z "$firmware_files" ]; then
         log_error "No .uf2 firmware files found in the release"
