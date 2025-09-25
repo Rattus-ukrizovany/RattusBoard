@@ -26,7 +26,7 @@ USER
 ├─────┼─────┼─────┼─────┼─────┼─────┤
 │M0C0 │M0C1 │M0C2 │M0C3 │M0C4 │M0C5 │
 └─────┴─────┴─────┴─────┴─────┴─────┘
-  T0    T1    T2                       ← Row 3 (thumbs, angled)
+                      T0    T1    T2     ← Row 3 (thumbs, angled)
 ```
 
 **Pinout (suggested for ZMK/QMK):**
