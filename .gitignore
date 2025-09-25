@@ -13,6 +13,9 @@ obj_*/
 qmk_firmware/
 firmware/
 
+# VIAL-QMK repository (cloned during CI)
+vial-qmk/
+
 # Temporary files
 *.tmp
 *.temp

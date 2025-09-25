@@ -21,43 +21,42 @@ jobs:
       with:
         python-version: '3.x'
 
-    - name: Install QMK CLI
+    - name: Install build dependencies
       run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-arm-none-eabi
         pip3 install qmk
         qmk --version
 
-    - name: Set up QMK environment
+    - name: Clone VIAL-QMK repository
       run: |
-        qmk setup --yes --home ~/.local/share/qmk
+        git clone https://github.com/vial-kb/vial-qmk.git vial-qmk
+        cd vial-qmk
+        git submodule update --init --recursive
 
-    - name: Copy RattusBoard keyboard files
+    - name: Set up VIAL-QMK environment
       run: |
-        mkdir -p ~/.local/share/qmk/keyboards/
-        cp -r keyboards/rattusboard ~/.local/share/qmk/keyboards/
-        ls -la ~/.local/share/qmk/keyboards/rattusboard/
-        echo "✅ RattusBoard keyboard files copied successfully"
-        qmk list-keyboards | grep rattusboard || echo "Warning: rattusboard not found in keyboard list"
+        qmk config user.qmk_home=$(pwd)/vial-qmk
+
+    - name: Copy RattusBoard keyboard files to VIAL-QMK
+      run: |
+        cp -r keyboards/rattusboard vial-qmk/keyboards/
+        ls -la vial-qmk/keyboards/rattusboard/
+        echo "✅ RattusBoard keyboard files copied to VIAL-QMK successfully"
 
     - name: Compile firmware
       run: |
-        echo "=== Compiling RattusBoard firmware ==="
+        echo "=== Compiling RattusBoard firmware using VIAL-QMK ==="
         echo "QMK Version: $(qmk --version)"
-        echo "Available keyboards containing 'rattus':"
-        qmk list-keyboards | grep -i rattus || echo "No rattusboard variants found in keyboard list"
         echo ""
-        echo "Keyboard files in ~/.local/share/qmk/keyboards/rattusboard/:"
-        ls -la ~/.local/share/qmk/keyboards/rattusboard/
+        echo "Keyboard files in vial-qmk/keyboards/rattusboard/:"
+        ls -la vial-qmk/keyboards/rattusboard/
         echo ""
         
-        # Compile the firmware (both default and VIAL)
-        echo "=== Compiling default firmware ==="
-        if qmk compile -kb rattusboard -km default; then
-          echo "✅ Default firmware compilation successful!"
-        else
-          echo "❌ Default firmware compilation failed"
-          exit 1
-        fi
+        # Set working directory to VIAL-QMK
+        cd vial-qmk
         
+        # Compile the VIAL firmware
         echo "=== Compiling VIAL firmware ==="
         if qmk compile -kb rattusboard -km vial; then
           echo "✅ VIAL firmware compilation successful!"
@@ -67,32 +66,24 @@ jobs:
         fi
         
         echo "Searching for generated .uf2 files..."
-        find ~/.local/share/qmk -name "*.uf2" -type f -exec ls -la {} \;
+        find . -name "*.uf2" -type f -exec ls -la {} \;
 
     - name: Find and copy all UF2 firmware files
       run: |
         echo "=== Searching for all compiled .uf2 firmware files ==="
         mkdir -p firmware-output
         
-        # Search for .uf2 files and log what we find
-        echo "Searching in QMK directory for .uf2 files..."
-        UF2_FILES=$(find ~/.local/share/qmk -name "*.uf2" -type f 2>/dev/null || true)
+        # Search for .uf2 files in VIAL-QMK directory and log what we find
+        echo "Searching in VIAL-QMK directory for .uf2 files..."
+        UF2_FILES=$(find vial-qmk -name "*.uf2" -type f 2>/dev/null || true)
         
         if [ -n "$UF2_FILES" ]; then
           echo "Found .uf2 files:"
           echo "$UF2_FILES"
           echo "Copying all .uf2 files to firmware-output/"
-          find ~/.local/share/qmk -name "*.uf2" -type f -exec cp {} firmware-output/ \;
+          find vial-qmk -name "*.uf2" -type f -exec cp {} firmware-output/ \;
         else
-          echo "No .uf2 files found in QMK directory"
-        fi
-        
-        # Also check if the build created any .uf2 files in the current directory
-        CURRENT_UF2=$(find . -maxdepth 2 -name "*.uf2" -type f 2>/dev/null || true)
-        if [ -n "$CURRENT_UF2" ]; then
-          echo "Found additional .uf2 files in current directory:"
-          echo "$CURRENT_UF2"
-          find . -maxdepth 2 -name "*.uf2" -type f -exec cp {} firmware-output/ \;
+          echo "No .uf2 files found in VIAL-QMK directory"
         fi
         
         echo "=== Final firmware-output directory contents ==="
@@ -229,26 +220,29 @@ jobs:
         tag_name: "build-${{ github.sha }}"
         name: "RattusBoard Firmware Build ${{ github.sha }}"
         body: |
-          ## RattusBoard Firmware Release
+          ## RattusBoard VIAL Firmware Release
 
-          Automatically generated firmware build from commit [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }}).
+          Automatically generated VIAL firmware build from commit [${{ github.sha }}](https://github.com/${{ github.repository }}/commit/${{ github.sha }}).
 
           **📦 This release contains ${{ steps.check_firmware.outputs.uf2_count }} firmware file(s)**
 
           ### Installation Instructions
-          1. Download the appropriate `.uf2` file(s) from the assets below.
+          1. Download the `rattusboard_vial.uf2` file from the assets below.
           2. Hold BOOTSEL and plug in USB on each Pico to enter bootloader mode.
           3. Drag the `.uf2` onto the RPI-RP2 drive for both halves.
           4. Connect halves with TRRS cable and plug USB into the left half.
 
-          ### Available Firmware Files
-          This release includes all compiled firmware variants. For typical users, download `rattusboard_default.uf2` if available.
+          ### About VIAL Firmware
+          This firmware is built using the official VIAL-QMK repository and provides:
+          - **Live keymap editing** using the VIAL app (get.vial.today)
+          - **No reflashing required** for keymap changes
+          - **All QMK features** plus VIAL-specific enhancements
 
           ### Features
           - Split keyboard support with auto hand detection
           - PMW3360 trackball integration (right half)
           - Rotary encoder support (right half)
-          - VIA/Vial configuration support
+          - VIAL configuration support
           - Full QMK feature set
 
           For detailed setup instructions, see the [README](https://github.com/${{ github.repository }}#-firmware-flashing--split-setup-important-clarification).

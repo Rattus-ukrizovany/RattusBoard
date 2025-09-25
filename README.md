@@ -1,6 +1,6 @@
 # 🐭 RattusBoard
 
-*A premium QMK-powered split ergonomic keyboard with integrated trackball and encoder*
+*A premium VIAL-powered split ergonomic keyboard with integrated trackball and encoder*
 
 [![QMK Firmware](https://img.shields.io/badge/QMK-Firmware-blue.svg)](https://qmk.fm/)
 [![Vial Support](https://img.shields.io/badge/Vial-Supported-green.svg)](https://get.vial.today/)
