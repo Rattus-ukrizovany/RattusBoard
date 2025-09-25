@@ -110,28 +110,25 @@ RUN wget https://github.com/raspberrypi/pico-sdk/archive/refs/tags/1.5.1.tar.gz 
 ENV PICO_SDK_PATH="/opt/pico-sdk"
 
 # Create startup script for easy usage
-RUN cat > /usr/local/bin/rattusboard-dev << 'EOF'
-#!/bin/bash
-echo "RattusBoard Development Environment for GitHub Codespaces"
-echo "========================================================"
-echo ""
-echo "Available tools:"
-echo "  renode                 - Start Renode simulator"
-echo "  qmk                    - QMK command line interface"
-echo "  arm-none-eabi-gcc      - ARM cross-compiler"
-echo ""
-echo "Quick start:"
-echo "  1. qmk compile -kb rattusboard -km default"
-echo "  2. renode sim/rattusboard.resc"
-echo ""
-echo "Simulation files:"
-echo "  sim/rattusboard.repl   - Platform description"
-echo "  sim/rattusboard.resc   - Simulation script"
-echo ""
-echo "Happy coding! 🐭⌨️"
-EOF
-
-RUN chmod +x /usr/local/bin/rattusboard-dev
+RUN printf '#!/bin/bash\n\
+echo "RattusBoard Development Environment for GitHub Codespaces"\n\
+echo "========================================================"\n\
+echo ""\n\
+echo "Available tools:"\n\
+echo "  renode                 - Start Renode simulator"\n\
+echo "  qmk                    - QMK command line interface"\n\
+echo "  arm-none-eabi-gcc      - ARM cross-compiler"\n\
+echo ""\n\
+echo "Quick start:"\n\
+echo "  1. qmk compile -kb rattusboard -km default"\n\
+echo "  2. renode sim/rattusboard.resc"\n\
+echo ""\n\
+echo "Simulation files:"\n\
+echo "  sim/rattusboard.repl   - Platform description"\n\
+echo "  sim/rattusboard.resc   - Simulation script"\n\
+echo ""\n\
+echo "Happy coding! 🐭⌨️"\n' > /usr/local/bin/rattusboard-dev \
+    && chmod +x /usr/local/bin/rattusboard-dev
 
 # Set up working directory permissions for workspace mount
 RUN mkdir -p /workspace \

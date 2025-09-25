@@ -97,41 +97,35 @@ RUN wget https://github.com/raspberrypi/pico-sdk/archive/refs/tags/1.5.1.tar.gz 
 ENV PICO_SDK_PATH="/opt/pico-sdk"
 
 # Create startup script
-RUN cat > /usr/local/bin/rattusboard-dev << 'EOF'
-#!/bin/bash
-echo "RattusBoard Development Environment"
-echo "=================================="
-echo ""
-echo "Available tools:"
-echo "  renode                 - Start Renode simulator"
-echo "  qmk                    - QMK command line interface"  
-echo "  arm-none-eabi-gcc      - ARM cross-compiler"
-echo ""
-echo "Simulation files:"
-echo "  rattusboard.repl       - Platform description"
-echo "  rattusboard.resc       - Simulation script"
-echo ""
-echo "Quick start:"
-echo "  1. cd /workspace"
-echo "  2. qmk compile -kb rattusboard -km default"
-echo "  3. renode rattusboard.resc"
-echo ""
-EOF
-
-RUN chmod +x /usr/local/bin/rattusboard-dev
+RUN printf '#!/bin/bash\n\
+echo "RattusBoard Development Environment"\n\
+echo "=================================="\n\
+echo ""\n\
+echo "Available tools:"\n\
+echo "  renode                 - Start Renode simulator"\n\
+echo "  qmk                    - QMK command line interface"\n\
+echo "  arm-none-eabi-gcc      - ARM cross-compiler"\n\
+echo ""\n\
+echo "Simulation files:"\n\
+echo "  rattusboard.repl       - Platform description"\n\
+echo "  rattusboard.resc       - Simulation script"\n\
+echo ""\n\
+echo "Quick start:"\n\
+echo "  1. cd /workspace"\n\
+echo "  2. qmk compile -kb rattusboard -km default"\n\
+echo "  3. renode rattusboard.resc"\n\
+echo ""\n' > /usr/local/bin/rattusboard-dev \
+    && chmod +x /usr/local/bin/rattusboard-dev
 
 # Install VS Code extensions helper
-RUN cat > /usr/local/bin/install-vscode-extensions << 'EOF'
-#!/bin/bash
-echo "Installing recommended VS Code extensions..."
-code --install-extension ms-vscode.cpptools
-code --install-extension ms-python.python
-code --install-extension ms-dotnettools.csharp
-code --install-extension QMK.qmk
-echo "Extensions installed!"
-EOF
-
-RUN chmod +x /usr/local/bin/install-vscode-extensions
+RUN printf '#!/bin/bash\n\
+echo "Installing recommended VS Code extensions..."\n\
+code --install-extension ms-vscode.cpptools\n\
+code --install-extension ms-python.python\n\
+code --install-extension ms-dotnettools.csharp\n\
+code --install-extension QMK.qmk\n\
+echo "Extensions installed!"\n' > /usr/local/bin/install-vscode-extensions \
+    && chmod +x /usr/local/bin/install-vscode-extensions
 
 # Set up working directory permissions
 RUN chown -R developer:developer /home/developer
