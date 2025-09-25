@@ -74,33 +74,33 @@ matrix_row2: Miscellaneous.Button @ gpio 4
 matrix_row3: Miscellaneous.Button @ gpio 5
     -> gpio@5
 
-// Matrix Column Pins - CORRECTED to match config.h
-// Config.h defines: MATRIX_COL_PINS { GP9, GP10, GP11, GP12, GP13, GP14 }
-// But HALVES_WIRING.md shows split mapping:
-// Left: GP9, GP10, GP11, GP12, GP13, GP14 (physically first 6 columns)
-// Right: GP15, GP16, GP17, GP18, GP19, GP20 (physically separate columns)
+// Matrix Column Pins - CORRECTED to match unified config.h
+// Config.h defines: MATRIX_COL_PINS { GP15, GP16, GP17, GP18, GP19, GP20 }
+// NEW UNIFIED DESIGN - Both halves use same pins:
+// Both halves: GP15, GP16, GP17, GP18, GP19, GP20 (unified column pins)
+// Each half only has its own physical pins populated
 
-// Left Half Matrix Column Pins (mapped to GP9-GP14 as per config.h)
-left_col0: Miscellaneous.Button @ gpio 9
-    -> gpio@9
+// Left Half Matrix Column Pins (mapped to GP15-GP20 as per unified config.h)
+left_col0: Miscellaneous.Button @ gpio 15
+    -> gpio@15
 
-left_col1: Miscellaneous.Button @ gpio 10
-    -> gpio@10
+left_col1: Miscellaneous.Button @ gpio 16
+    -> gpio@16
 
-left_col2: Miscellaneous.Button @ gpio 11
-    -> gpio@11
+left_col2: Miscellaneous.Button @ gpio 17
+    -> gpio@17
 
-left_col3: Miscellaneous.Button @ gpio 12
-    -> gpio@12
+left_col3: Miscellaneous.Button @ gpio 18
+    -> gpio@18
 
-left_col4: Miscellaneous.Button @ gpio 13
-    -> gpio@13
+left_col4: Miscellaneous.Button @ gpio 19
+    -> gpio@19
 
-left_col5: Miscellaneous.Button @ gpio 14
-    -> gpio@14
+left_col5: Miscellaneous.Button @ gpio 20
+    -> gpio@20
 
-// Right Half Matrix Column Pins - Based on HALVES_WIRING.md table
-// These are physically separate pins on the right half MCU
+// Right Half Matrix Column Pins - Same pins as left (unified design)
+// Both halves use identical pin assignments: GP15-GP20
 right_col0: Miscellaneous.Button @ gpio 15
     -> gpio@15
 
@@ -177,11 +177,11 @@ rosc: Miscellaneous.DummyPeripheral @ sysbus 0x40060000
 // ===== GPIO PIN FUNCTION MAPPING =====
 // This section documents the pin assignments for reference
 //
-// Matrix (both halves):
+// Matrix (both halves - unified design):
 //   Rows: GP2, GP3, GP4, GP5
 //   
-// Left Half Columns: GP9, GP10, GP11, GP12, GP13, GP14
-// Right Half Columns: GP15, GP16, GP17, GP18, GP19, GP20
+// Both Halves Columns: GP15, GP16, GP17, GP18, GP19, GP20 (unified pins)
+// Each half only has its own physical pins populated
 //
 // Communication:
 //   Split Serial: GP1

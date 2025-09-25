@@ -49,7 +49,7 @@ echo "To start simulation: start"
 
 # Define test macros for easy debugging
 
-# Test left half matrix (GP9-GP14 columns, GP2-GP5 rows)  
+# Test left half matrix (GP15-GP20 columns, GP2-GP5 rows)  
 macro reset
 """
     pause
