@@ -4,71 +4,82 @@
   "url": "https://github.com/Rattus-ukrizovany/RattusBoard",
   "maintainer": "Rattus-ukrizovany",
   "processor": "RP2040",
+  "bootloader": "rp2040",
   "diode_direction": "COL2ROW",
-  "split": true,
+  "debounce": 5,
   "matrix_pins": {
     "rows": ["GP2", "GP3", "GP4", "GP5"],
-    "cols_left": ["GP9", "GP10", "GP11", "GP12", "GP13", "GP14"],
-    "cols_right": ["GP15", "GP16", "GP17", "GP18", "GP19", "GP20"]
+    "cols": ["GP9", "GP10", "GP11", "GP12", "GP13", "GP14"]
   },
-  "features": [
-    "pointing_device_pmw3360",
-    "rotary_encoder",
-    "vial",
-    "split_keyboard"
-  ],
+  "split": {
+    "enabled": true,
+    "soft_serial_pin": "GP1",
+    "handedness": {
+      "pin": "GP21"
+    }
+  },
+  "encoder": {
+    "rotary": [
+      {"pin_a": "GP26", "pin_b": "GP27", "resolution": 4}
+    ]
+  },
+  "features": {
+    "pointing_device": true,
+    "encoder": true,
+    "split": true
+  },
   "layouts": {
     "LAYOUT_split_3x6_3": {
       "layout": [
-        {"label": "K00", "x":0, "y":0},
-        {"label": "K01", "x":1, "y":0},
-        {"label": "K02", "x":2, "y":0},
-        {"label": "K03", "x":3, "y":0},
-        {"label": "K04", "x":4, "y":0},
-        {"label": "K05", "x":5, "y":0},
+        {"matrix": [0, 0], "x": 0, "y": 0},
+        {"matrix": [0, 1], "x": 1, "y": 0},
+        {"matrix": [0, 2], "x": 2, "y": 0},
+        {"matrix": [0, 3], "x": 3, "y": 0},
+        {"matrix": [0, 4], "x": 4, "y": 0},
+        {"matrix": [0, 5], "x": 5, "y": 0},
         
-        {"label": "K06", "x":8, "y":0},
-        {"label": "K07", "x":9, "y":0},
-        {"label": "K08", "x":10, "y":0},
-        {"label": "K09", "x":11, "y":0},
-        {"label": "K0A", "x":12, "y":0},
-        {"label": "K0B", "x":13, "y":0},
+        {"matrix": [4, 0], "x": 8, "y": 0},
+        {"matrix": [4, 1], "x": 9, "y": 0},
+        {"matrix": [4, 2], "x": 10, "y": 0},
+        {"matrix": [4, 3], "x": 11, "y": 0},
+        {"matrix": [4, 4], "x": 12, "y": 0},
+        {"matrix": [4, 5], "x": 13, "y": 0},
         
-        {"label": "K10", "x":0, "y":1},
-        {"label": "K11", "x":1, "y":1},
-        {"label": "K12", "x":2, "y":1},
-        {"label": "K13", "x":3, "y":1},
-        {"label": "K14", "x":4, "y":1},
-        {"label": "K15", "x":5, "y":1},
+        {"matrix": [1, 0], "x": 0, "y": 1},
+        {"matrix": [1, 1], "x": 1, "y": 1},
+        {"matrix": [1, 2], "x": 2, "y": 1},
+        {"matrix": [1, 3], "x": 3, "y": 1},
+        {"matrix": [1, 4], "x": 4, "y": 1},
+        {"matrix": [1, 5], "x": 5, "y": 1},
         
-        {"label": "K16", "x":8, "y":1},
-        {"label": "K17", "x":9, "y":1},
-        {"label": "K18", "x":10, "y":1},
-        {"label": "K19", "x":11, "y":1},
-        {"label": "K1A", "x":12, "y":1},
-        {"label": "K1B", "x":13, "y":1},
+        {"matrix": [5, 0], "x": 8, "y": 1},
+        {"matrix": [5, 1], "x": 9, "y": 1},
+        {"matrix": [5, 2], "x": 10, "y": 1},
+        {"matrix": [5, 3], "x": 11, "y": 1},
+        {"matrix": [5, 4], "x": 12, "y": 1},
+        {"matrix": [5, 5], "x": 13, "y": 1},
         
-        {"label": "K20", "x":0, "y":2},
-        {"label": "K21", "x":1, "y":2},
-        {"label": "K22", "x":2, "y":2},
-        {"label": "K23", "x":3, "y":2},
-        {"label": "K24", "x":4, "y":2},
-        {"label": "K25", "x":5, "y":2},
+        {"matrix": [2, 0], "x": 0, "y": 2},
+        {"matrix": [2, 1], "x": 1, "y": 2},
+        {"matrix": [2, 2], "x": 2, "y": 2},
+        {"matrix": [2, 3], "x": 3, "y": 2},
+        {"matrix": [2, 4], "x": 4, "y": 2},
+        {"matrix": [2, 5], "x": 5, "y": 2},
         
-        {"label": "K26", "x":8, "y":2},
-        {"label": "K27", "x":9, "y":2},
-        {"label": "K28", "x":10, "y":2},
-        {"label": "K29", "x":11, "y":2},
-        {"label": "K2A", "x":12, "y":2},
-        {"label": "K2B", "x":13, "y":2},
+        {"matrix": [6, 0], "x": 8, "y": 2},
+        {"matrix": [6, 1], "x": 9, "y": 2},
+        {"matrix": [6, 2], "x": 10, "y": 2},
+        {"matrix": [6, 3], "x": 11, "y": 2},
+        {"matrix": [6, 4], "x": 12, "y": 2},
+        {"matrix": [6, 5], "x": 13, "y": 2},
         
-        {"label": "K33", "x":3, "y":3.25},
-        {"label": "K34", "x":4, "y":3.25},
-        {"label": "K35", "x":5, "y":3.25},
+        {"matrix": [3, 3], "x": 3, "y": 3.25},
+        {"matrix": [3, 4], "x": 4, "y": 3.25},
+        {"matrix": [3, 5], "x": 5, "y": 3.25},
         
-        {"label": "K30", "x":8, "y":3.25},
-        {"label": "K31", "x":9, "y":3.25},
-        {"label": "K32", "x":10, "y":3.25}
+        {"matrix": [7, 0], "x": 8, "y": 3.25},
+        {"matrix": [7, 1], "x": 9, "y": 3.25},
+        {"matrix": [7, 2], "x": 10, "y": 3.25}
       ]
     }
   },
