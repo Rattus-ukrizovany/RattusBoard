@@ -38,7 +38,7 @@ RattusBoard is a cutting-edge split ergonomic keyboard designed for productivity
 
 ## 📋 Hardware Specifications
 
-See the previous README for detailed specs, or consult the wiring guides for pinouts and matrix info.
+See the previous README for detailed specs, or consult the [wiring guide](HALVES_WIRING.md) for pinouts and matrix info.
 
 ---
 
