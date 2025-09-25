@@ -11,11 +11,11 @@
 				"ms-vscode.cpptools",
 				"ms-python.python",
 				"ms-dotnettools.csharp",
-				"QMK.qmk",
 				"ms-vscode.cmake-tools",
 				"ms-vscode.makefile-tools",
 				"redhat.vscode-yaml",
-				"ms-vscode.vscode-json"
+				"ms-vscode.vscode-json",
+				"ms-vscode.hexeditor"
 			],
 			"settings": {
 				"terminal.integrated.defaultProfile.linux": "bash",
@@ -38,7 +38,7 @@
 	"postCreateCommand": [
 		"bash",
 		"-c",
-		"echo 'Setting up RattusBoard development environment...' && qmk setup -y && echo 'Environment ready! Run: qmk compile -kb rattusboard -km default && renode sim/rattusboard.resc'"
+		"echo 'Setting up RattusBoard development environment...' && qmk setup -y && echo 'Environment ready! Test with: .devcontainer/test-environment.sh' && echo 'Quick start: qmk compile -kb rattusboard -km default && renode sim/rattusboard.resc'"
 	],
 	"remoteUser": "developer",
 	"workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",

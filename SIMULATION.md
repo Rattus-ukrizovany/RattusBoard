@@ -400,8 +400,11 @@ GitHub Codespaces provides a cloud-based development environment that's pre-conf
    - QMK, Renode, and ARM toolchain are ready to use
    - VS Code opens with recommended extensions
 
-3. **Start Developing**:
+3. **Start developing**:
    ```bash
+   # Test the environment (optional)
+   .devcontainer/test-environment.sh
+   
    # Compile the default firmware
    qmk compile -kb rattusboard -km default
    
