@@ -7,9 +7,10 @@
 #define MATRIX_ROWS 8
 #define MATRIX_COLS 6
 
-/* 
+/*
  * Keyboard Matrix Assignments (Raspberry Pi Pico / RP2040)
  * 
+ * Matrix configuration moved to keyboard.json to avoid conflicts
  * New Layout: unified 4x6 matrix per half (3 main rows + 1 thumb row)
  * Each half uses the same pin assignments:
  * 
@@ -21,22 +22,15 @@
  * - Rows: GP2, GP3, GP4, GP5 (row 3 = thumbs)
  * - Cols: GP15, GP16, GP17, GP18, GP19, GP20
  */
-#define MATRIX_ROW_PINS { GP2, GP3, GP4, GP5 }
-#define MATRIX_COL_PINS { GP15, GP16, GP17, GP18, GP19, GP20 }
 
-/* COL2ROW, ROW2COL */
-#define DIODE_DIRECTION COL2ROW
-
-/* Debounce reduces chatter (unintended double-presses) - set 0 if debouncing is not needed */
-#define DEBOUNCE 5
+/* 
+ * Diode direction and debounce moved to keyboard.json
+ */
 
 /* 
  * Split keyboard settings 
+ * Split configuration moved to keyboard.json 
  */
-#define SPLIT_HAND_PIN GP21
-#define SPLIT_HAND_PIN_LOW_IS_LEFT
-#define SOFT_SERIAL_PIN GP1
-#define SPLIT_USB_DETECT
 
 /* 
  * PMW3360 Trackball Configuration
@@ -54,10 +48,8 @@
 /*
  * Rotary Encoder Configuration (Mouse Wheel)
  * Connected to right half for scroll wheel functionality
+ * Configuration moved to keyboard.json
  */
-#define ENCODERS_PAD_A { GP26 }
-#define ENCODERS_PAD_B { GP27 }
-#define ENCODER_RESOLUTION 4
 
 /*
  * Feature flags

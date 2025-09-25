@@ -34,15 +34,13 @@ jobs:
       run: |
         mkdir -p ~/.local/share/qmk/keyboards/
         cp -r keyboards/rattusboard ~/.local/share/qmk/keyboards/
-        if [ -f ~/.local/share/qmk/keyboards/rattusboard/info.json ] && [ ! -f ~/.local/share/qmk/keyboards/rattusboard/keyboard.json ]; then
-          mv ~/.local/share/qmk/keyboards/rattusboard/info.json ~/.local/share/qmk/keyboards/rattusboard/keyboard.json
-        fi
         ls -la ~/.local/share/qmk/keyboards/rattusboard/
+        echo "✅ RattusBoard keyboard files copied successfully"
         qmk list-keyboards | grep rattusboard || echo "Warning: rattusboard not found in keyboard list"
 
     - name: Compile firmware
       run: |
-        echo "=== Attempting to compile RattusBoard firmware ==="
+        echo "=== Compiling RattusBoard firmware ==="
         echo "QMK Version: $(qmk --version)"
         echo "Available keyboards containing 'rattus':"
         qmk list-keyboards | grep -i rattus || echo "No rattusboard variants found in keyboard list"
@@ -51,34 +49,25 @@ jobs:
         ls -la ~/.local/share/qmk/keyboards/rattusboard/
         echo ""
         
-        # Try to compile the firmware
+        # Compile the firmware (both default and VIAL)
+        echo "=== Compiling default firmware ==="
         if qmk compile -kb rattusboard -km default; then
-          echo "✅ Firmware compilation successful!"
-          echo "Searching for generated .uf2 files..."
-          find ~/.local/share/qmk -name "*.uf2" -type f -exec ls -la {} \;
+          echo "✅ Default firmware compilation successful!"
         else
-          echo "❌ Firmware compilation failed"
-          echo ""
-          echo "=== Debugging Information ==="
-          echo "This is expected due to firmware configuration issues."
-          echo "The workflow setup is working correctly, but the keyboard firmware needs configuration updates."
-          echo ""
-          echo "Available keyboards:"
-          qmk list-keyboards | grep -i rattus || echo "rattusboard not found in keyboard list"
-          echo ""
-          echo "Creating placeholder firmware files for testing workflow..."
-          mkdir -p firmware-output
-          
-          # Create test .uf2 files to demonstrate the workflow works
-          echo "Test firmware content for rattusboard_default.uf2" > firmware-output/rattusboard_default.uf2
-          echo "Test firmware content for rattusboard_left.uf2" > firmware-output/rattusboard_left.uf2  
-          echo "Test firmware content for rattusboard_right.uf2" > firmware-output/rattusboard_right.uf2
-          
-          echo "Firmware compilation failed due to configuration issues. Please see Actions log for details." > firmware-output/compilation-failed.txt
-          echo ""
-          echo "✅ Created test firmware files to demonstrate workflow functionality:"
-          ls -la firmware-output/
+          echo "❌ Default firmware compilation failed"
+          exit 1
         fi
+        
+        echo "=== Compiling VIAL firmware ==="
+        if qmk compile -kb rattusboard -km vial; then
+          echo "✅ VIAL firmware compilation successful!"
+        else
+          echo "❌ VIAL firmware compilation failed"
+          exit 1
+        fi
+        
+        echo "Searching for generated .uf2 files..."
+        find ~/.local/share/qmk -name "*.uf2" -type f -exec ls -la {} \;
 
     - name: Find and copy all UF2 firmware files
       run: |
