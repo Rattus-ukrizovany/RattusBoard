@@ -10,7 +10,6 @@
 			"extensions": [
 				"ms-vscode.cpptools",
 				"ms-python.python",
-				"ms-dotnettools.csharp",
 				"ms-vscode.cmake-tools",
 				"ms-vscode.makefile-tools",
 				"redhat.vscode-yaml",
@@ -19,14 +18,9 @@
 			],
 			"settings": {
 				"terminal.integrated.defaultProfile.linux": "bash",
-				"files.associations": {
-					"*.resc": "csharp",
-					"*.repl": "yaml"
-				},
 				"C_Cpp.default.compilerPath": "/usr/bin/arm-none-eabi-gcc",
 				"C_Cpp.default.includePath": [
 					"${workspaceFolder}/keyboards/rattusboard/**",
-					"/opt/pico-sdk/src/**",
 					"${workspaceFolder}/**"
 				],
 				"python.defaultInterpreterPath": "/usr/bin/python3",
@@ -38,7 +32,7 @@
 	"postCreateCommand": [
 		"bash",
 		"-c",
-		"echo 'Setting up RattusBoard development environment...' && qmk setup -y && echo 'Downloading latest firmware...' && rattusboard-download-firmware || echo 'Warning: Firmware download failed, but environment is ready' && echo 'Environment ready! Quick start: rattusboard-test-firmware' && echo 'For help: rattusboard-dev'"
+		"echo 'Setting up RattusBoard development environment...' && echo 'Environment ready! Use qmk compile -kb rattusboard -km default to build firmware'"
 	],
 	"remoteUser": "developer",
 	"workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
@@ -47,7 +41,6 @@
 		"source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
 	],
 	"containerEnv": {
-		"QMK_HOME": "/workspace",
-		"PICO_SDK_PATH": "/opt/pico-sdk"
+		"QMK_HOME": "/workspace"
 	}
 }
