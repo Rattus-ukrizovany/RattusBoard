@@ -1,0 +1,213 @@
+# RattusBoard Renode Simulation Script
+# Copyright 2024 RattusBoard Project
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# Renode simulation script for RP2040-based RattusBoard
+# Loads firmware and provides test scenarios for development and validation
+
+# Load the platform description
+mach create "rattusboard"
+machine LoadPlatformDescription @sim/rattusboard.repl
+
+# Set up logging levels
+logLevel -1 gpio
+logLevel -1 spi0
+logLevel 0 pmw3360
+
+# Configure the machine name and display settings
+machine SetSerialExecution true
+emulation SetGlobalQuantum "0.00001"
+
+# Initialize default GPIO states to match hardware expectations
+# Left half configuration (GP21 -> GND for hand detection)
+gpio.matrix_row0 Press
+gpio.left_col0 Press
+gpio.hand_detect Press  # Low for left half
+
+# Right half would have hand_detect released (high/float)
+# gpio.hand_detect Release  # High for right half
+
+# Load firmware (user needs to provide the path)
+# Uncomment and modify path as needed:
+# sysbus LoadELF @path/to/rattusboard_firmware.elf
+
+# Alternative: Load binary firmware
+# sysbus LoadBinary @path/to/rattusboard_firmware.bin 0x10000000
+
+echo "RattusBoard simulation initialized."
+echo "Available test commands:"
+echo "  test_matrix_left    - Test left half key matrix"
+echo "  test_matrix_right   - Test right half key matrix" 
+echo "  test_trackball      - Test PMW3360 trackball sensor"
+echo "  test_encoder        - Test rotary encoder"
+echo "  test_split_comm     - Test split keyboard communication"
+echo "  configure_left      - Configure as left half"
+echo "  configure_right     - Configure as right half"
+echo ""
+echo "To load firmware: sysbus LoadELF @path/to/firmware.elf"
+echo "To start simulation: start"
+
+# Define test macros for easy debugging
+
+# Test left half matrix (GP9-GP14 columns, GP2-GP5 rows)  
+macro reset
+"""
+    pause
+    sysbus Reset
+"""
+
+macro test_matrix_left
+"""
+    echo "Testing left half matrix..."
+    # Simulate key press on left half (row 0, col 0)
+    gpio.left_col0 Press
+    gpio.matrix_row0 Press
+    sleep 0.1
+    gpio.left_col0 Release
+    gpio.matrix_row0 Release
+    echo "Left matrix test key pressed and released"
+"""
+
+macro test_matrix_right  
+"""
+    echo "Testing right half matrix..."
+    # Simulate key press on right half (row 0, col 0)
+    gpio.right_col0 Press
+    gpio.matrix_row0 Press  
+    sleep 0.1
+    gpio.right_col0 Release
+    gpio.matrix_row0 Release
+    echo "Right matrix test key pressed and released"
+"""
+
+macro test_trackball
+"""
+    echo "Testing PMW3360 trackball sensor..."
+    # Simulate SPI communication with PMW3360
+    gpio.pmw3360_cs Press
+    sleep 0.01
+    gpio.pmw3360_cs Release
+    echo "PMW3360 SPI transaction simulated"
+    
+    # Simulate motion data
+    pmw3360 SetMotion 10 -5
+    echo "Trackball motion simulated: X=10, Y=-5"
+"""
+
+macro test_encoder
+"""
+    echo "Testing rotary encoder..."
+    # Simulate encoder rotation (clockwise)
+    gpio.encoder_a Press
+    sleep 0.01
+    gpio.encoder_b Press
+    sleep 0.01  
+    gpio.encoder_a Release
+    sleep 0.01
+    gpio.encoder_b Release
+    echo "Encoder clockwise rotation simulated"
+    
+    # Simulate encoder rotation (counter-clockwise)
+    gpio.encoder_b Press
+    sleep 0.01
+    gpio.encoder_a Press
+    sleep 0.01
+    gpio.encoder_b Release  
+    sleep 0.01
+    gpio.encoder_a Release
+    echo "Encoder counter-clockwise rotation simulated"
+"""
+
+macro test_split_comm
+"""
+    echo "Testing split keyboard communication..."
+    # Simulate serial communication between halves
+    gpio.split_serial Press
+    sleep 0.01
+    gpio.split_serial Release
+    echo "Split communication pulse sent"
+"""
+
+macro configure_left
+"""
+    echo "Configuring as left half..."
+    # GP21 -> GND (low) indicates left half
+    gpio.hand_detect Press
+    echo "Hand detection set to LEFT (GP21 -> GND)"
+"""
+
+macro configure_right
+"""
+    echo "Configuring as right half..."  
+    # GP21 -> Float (high) indicates right half
+    gpio.hand_detect Release
+    echo "Hand detection set to RIGHT (GP21 -> Float)"
+"""
+
+macro demo_keyboard_sequence
+"""
+    echo "Running keyboard demo sequence..."
+    configure_left
+    sleep 0.1
+    
+    # Simulate typing "HELLO" on left half
+    echo "Typing H..."
+    gpio.left_col1 Press
+    gpio.matrix_row1 Press
+    sleep 0.05
+    gpio.left_col1 Release  
+    gpio.matrix_row1 Release
+    sleep 0.05
+    
+    echo "Typing E..."
+    gpio.left_col2 Press
+    gpio.matrix_row2 Press  
+    sleep 0.05
+    gpio.left_col2 Release
+    gpio.matrix_row2 Release
+    sleep 0.05
+    
+    # Switch to right half
+    configure_right
+    sleep 0.1
+    
+    # Test trackball
+    test_trackball
+    sleep 0.1
+    
+    # Test encoder
+    test_encoder
+    
+    echo "Demo sequence completed"
+"""
+
+macro interactive_test_menu
+"""
+    echo "=== RattusBoard Interactive Test Menu ==="
+    echo "1. test_matrix_left    - Test left matrix keys"
+    echo "2. test_matrix_right   - Test right matrix keys"
+    echo "3. test_trackball      - Test PMW3360 sensor"
+    echo "4. test_encoder        - Test rotary encoder"
+    echo "5. test_split_comm     - Test communication"
+    echo "6. configure_left      - Set as left half"
+    echo "7. configure_right     - Set as right half" 
+    echo "8. demo_keyboard_sequence - Run full demo"
+    echo "9. reset               - Reset simulation"
+    echo ""
+    echo "Usage: Execute any macro by typing its name"
+    echo "Example: test_matrix_left"
+"""
+
+# Show the interactive menu on startup
+interactive_test_menu
+
+# Enable GPIO monitoring for debugging
+monitor gpio
+
+# Set initial state as left half for testing
+configure_left
+
+echo ""
+echo "RattusBoard simulation ready!"
+echo "Load your firmware with: sysbus LoadELF @path/to/firmware.elf"
+echo "Start simulation with: start"

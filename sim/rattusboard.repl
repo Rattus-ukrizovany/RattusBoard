@@ -1,0 +1,206 @@
+// RattusBoard Platform Description for Renode
+// Copyright 2024 RattusBoard Project
+// SPDX-License-Identifier: GPL-3.0-or-later
+//
+// Platform description for RP2040-based RattusBoard split keyboard
+// Matches hardware configuration from config.h, HALVES_WIRING.md, and wiring_diagram.txt
+
+using "platforms/cpus/rp2040.repl"
+
+// Define the machine as RP2040-based
+rp2040: CPU.CortexM @ sysbus
+    cpuType: "cortex-m0+"
+    nvic: nvic
+
+// Add memory mapping for RP2040
+rom: Memory.MappedMemory @ sysbus 0x10000000
+    size: 0x4000
+
+flash: Memory.MappedMemory @ sysbus 0x10000000
+    size: 0x1000000  // 16MB flash for firmware
+
+sram: Memory.MappedMemory @ sysbus 0x20000000  
+    size: 0x42000   // 264KB SRAM
+
+// GPIO Controllers (RP2040 has 30 GPIO pins: GP0-GP29)
+gpio: GPIOPort.RP2040_GPIO @ sysbus 0x40014000
+    numberOfPins: 30
+    [0-29] -> gpioc@[0-29]
+
+gpioc: IRQControllers.RP2040_GPIOController @ gpio
+    [0-29] -> nvic@[13-15]
+
+// SPI Controllers for PMW3360 trackball sensor
+spi0: SPI.RP2040_SPI @ sysbus 0x4003c000
+    -> nvic@18
+
+// UART for split keyboard communication  
+uart0: UART.PL011 @ sysbus 0x40034000
+    -> nvic@20
+
+uart1: UART.PL011 @ sysbus 0x40038000
+    -> nvic@21
+
+// Timer for debouncing and general timing
+timer: Timers.RP2040_Timer @ sysbus 0x40054000
+    frequency: 1000000
+    -> nvic@0
+
+// I2C controllers (for potential OLED displays)
+i2c0: I2C.RP2040_I2C @ sysbus 0x40044000
+    -> nvic@23
+
+i2c1: I2C.RP2040_I2C @ sysbus 0x40048000  
+    -> nvic@24
+
+// Interrupt controller
+nvic: IRQControllers.NVIC @ sysbus 0xE000E000
+    systickFrequency: 125000000
+    IRQ -> rp2040@0
+
+// USB controller for master half connection
+usb: USB.RP2040_USB @ sysbus 0x50100000
+    -> nvic@5
+
+// ===== RATTUSBOARD SPECIFIC GPIO MAPPING =====
+
+// Matrix Row Pins (both halves) - GP2, GP3, GP4, GP5
+matrix_row0: Miscellaneous.Button @ gpio 2
+    -> gpio@2
+
+matrix_row1: Miscellaneous.Button @ gpio 3  
+    -> gpio@3
+
+matrix_row2: Miscellaneous.Button @ gpio 4
+    -> gpio@4
+
+matrix_row3: Miscellaneous.Button @ gpio 5
+    -> gpio@5
+
+// Matrix Column Pins - CORRECTED to match config.h
+// Config.h defines: MATRIX_COL_PINS { GP9, GP10, GP11, GP12, GP13, GP14 }
+// But HALVES_WIRING.md shows split mapping:
+// Left: GP9, GP10, GP11, GP12, GP13, GP14 (physically first 6 columns)
+// Right: GP15, GP16, GP17, GP18, GP19, GP20 (physically separate columns)
+
+// Left Half Matrix Column Pins (mapped to GP9-GP14 as per config.h)
+left_col0: Miscellaneous.Button @ gpio 9
+    -> gpio@9
+
+left_col1: Miscellaneous.Button @ gpio 10
+    -> gpio@10
+
+left_col2: Miscellaneous.Button @ gpio 11
+    -> gpio@11
+
+left_col3: Miscellaneous.Button @ gpio 12
+    -> gpio@12
+
+left_col4: Miscellaneous.Button @ gpio 13
+    -> gpio@13
+
+left_col5: Miscellaneous.Button @ gpio 14
+    -> gpio@14
+
+// Right Half Matrix Column Pins - Based on HALVES_WIRING.md table
+// These are physically separate pins on the right half MCU
+right_col0: Miscellaneous.Button @ gpio 15
+    -> gpio@15
+
+right_col1: Miscellaneous.Button @ gpio 16
+    -> gpio@16
+
+right_col2: Miscellaneous.Button @ gpio 17
+    -> gpio@17
+
+right_col3: Miscellaneous.Button @ gpio 18
+    -> gpio@18
+
+right_col4: Miscellaneous.Button @ gpio 19
+    -> gpio@19
+
+right_col5: Miscellaneous.Button @ gpio 20
+    -> gpio@20
+
+// Split Communication - GP1 (SOFT_SERIAL_PIN)
+split_serial: Miscellaneous.Button @ gpio 1
+    -> gpio@1
+
+// Split Hand Detection - GP21 (SPLIT_HAND_PIN)
+// Left: GP21 -> GND (low), Right: GP21 -> Float (high)
+hand_detect: Miscellaneous.Button @ gpio 21
+    -> gpio@21
+
+// PMW3360 Trackball SPI Interface (Right Half Only)
+// CS - GP22, SCK - GP23, MOSI - GP24, MISO - GP25
+pmw3360: Sensors.PMW3360 @ spi0
+    frequency: 2000000
+    
+pmw3360_cs: Miscellaneous.Button @ gpio 22
+    -> gpio@22
+
+// SPI pins connected to PMW3360
+spi0_sck: Miscellaneous.Button @ gpio 23
+    -> gpio@23
+
+spi0_mosi: Miscellaneous.Button @ gpio 24
+    -> gpio@24
+
+spi0_miso: Miscellaneous.Button @ gpio 25
+    -> gpio@25
+
+// Rotary Encoder (Right Half Only) - GP26, GP27
+encoder_a: Miscellaneous.Button @ gpio 26
+    -> gpio@26
+
+encoder_b: Miscellaneous.Button @ gpio 27
+    -> gpio@27
+
+// Status LED and Bootloader Reset - GP28
+status_led: Miscellaneous.LED @ gpio 28
+    -> gpio@28
+
+// Optional motion interrupt from PMW3360 - GP29 
+motion_interrupt: Miscellaneous.Button @ gpio 29
+    -> gpio@29
+
+// Additional RP2040 peripherals
+watchdog: Miscellaneous.RP2040_Watchdog @ sysbus 0x40058000
+    frequency: 1000000
+
+pll_sys: Miscellaneous.RP2040_PLL @ sysbus 0x40028000
+pll_usb: Miscellaneous.RP2040_PLL @ sysbus 0x4002c000
+
+clocks: Miscellaneous.RP2040_Clocks @ sysbus 0x40008000
+
+xosc: Miscellaneous.RP2040_XOSC @ sysbus 0x40024000
+    frequency: 12000000
+
+rosc: Miscellaneous.RP2040_ROSC @ sysbus 0x40060000
+
+// Connect SPI to PMW3360 sensor
+spi0:
+    Peripheral -> pmw3360@0
+
+// ===== GPIO PIN FUNCTION MAPPING =====
+// This section documents the pin assignments for reference
+//
+// Matrix (both halves):
+//   Rows: GP2, GP3, GP4, GP5
+//   
+// Left Half Columns: GP9, GP10, GP11, GP12, GP13, GP14
+// Right Half Columns: GP15, GP16, GP17, GP18, GP19, GP20
+//
+// Communication:
+//   Split Serial: GP1
+//   Hand Detection: GP21 (Low=Left, Float=Right)
+//
+// PMW3360 Trackball (Right Half):
+//   CS: GP22, SCK: GP23, MOSI: GP24, MISO: GP25
+//   Motion IRQ: GP29 (optional)
+//
+// Rotary Encoder (Right Half):
+//   A Phase: GP26, B Phase: GP27
+//
+// Status/Control:
+//   Bootloader LED: GP28
