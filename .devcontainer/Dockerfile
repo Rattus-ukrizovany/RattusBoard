@@ -109,19 +109,33 @@ RUN wget https://github.com/raspberrypi/pico-sdk/archive/refs/tags/1.5.1.tar.gz 
 # Set up Pico SDK environment
 ENV PICO_SDK_PATH="/opt/pico-sdk"
 
+# Copy and install helper scripts
+COPY .devcontainer/download-firmware.sh /usr/local/bin/rattusboard-download-firmware
+COPY .devcontainer/test-firmware-renode.sh /usr/local/bin/rattusboard-test-firmware
+RUN chmod +x /usr/local/bin/rattusboard-download-firmware /usr/local/bin/rattusboard-test-firmware
+
 # Create startup script for easy usage
 RUN printf '#!/bin/bash\n\
 echo "RattusBoard Development Environment for GitHub Codespaces"\n\
 echo "========================================================"\n\
 echo ""\n\
 echo "Available tools:"\n\
-echo "  renode                 - Start Renode simulator"\n\
-echo "  qmk                    - QMK command line interface"\n\
-echo "  arm-none-eabi-gcc      - ARM cross-compiler"\n\
+echo "  renode                         - Start Renode simulator"\n\
+echo "  qmk                            - QMK command line interface"\n\
+echo "  arm-none-eabi-gcc              - ARM cross-compiler"\n\
+echo "  rattusboard-download-firmware  - Download latest firmware from GitHub"\n\
+echo "  rattusboard-test-firmware      - Download and test firmware in Renode"\n\
 echo ""\n\
 echo "Quick start:"\n\
-echo "  1. qmk compile -kb rattusboard -km default"\n\
-echo "  2. renode sim/rattusboard.resc"\n\
+echo "  1. rattusboard-test-firmware   # Download and test firmware in one command"\n\
+echo "  2. qmk compile -kb rattusboard -km default  # Compile locally"\n\
+echo "  3. renode sim/rattusboard.resc  # Manual Renode simulation"\n\
+echo ""\n\
+echo "Firmware testing:"\n\
+echo "  rattusboard-download-firmware -l          # List available firmware"\n\
+echo "  rattusboard-download-firmware             # Download default firmware"\n\
+echo "  rattusboard-test-firmware -i              # Interactive Renode session"\n\
+echo "  rattusboard-test-firmware -t              # Automated tests only"\n\
 echo ""\n\
 echo "Simulation files:"\n\
 echo "  sim/rattusboard.repl   - Platform description"\n\

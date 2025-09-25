@@ -120,6 +120,123 @@ Follow the wiring diagrams and pin assignments in the repo. Each half has indepe
 
 ---
 
+## 🧪 Virtual Firmware Test Environment
+
+### GitHub Codespaces Quick Start
+
+The RattusBoard repository includes a complete virtual testing environment that automatically downloads the latest firmware and runs it in Renode simulation. This is perfect for testing firmware without physical hardware.
+
+#### Automatic Setup
+
+1. **Open in Codespaces**: Click the green "Code" button → "Codespaces" → "Create codespace on main"
+2. **Wait for setup**: The environment automatically:
+   - Installs QMK, Renode, and all dependencies 
+   - Downloads the latest firmware release (`rattusboard_default.uf2`)
+   - Sets up the complete development environment (~3-4 minutes)
+3. **Start testing**: Run `rattusboard-test-firmware` to test firmware in Renode
+
+#### Available Commands
+
+| Command | Description |
+|---------|-------------|
+| `rattusboard-test-firmware` | Download latest firmware and run in Renode (one-step testing) |
+| `rattusboard-test-firmware -i` | Start interactive Renode session with firmware loaded |
+| `rattusboard-test-firmware -t` | Run automated tests only (no interactive mode) |
+| `rattusboard-test-firmware -l` | Test left half configuration |
+| `rattusboard-test-firmware -r` | Test right half configuration |
+| `rattusboard-download-firmware` | Download latest firmware without testing |
+| `rattusboard-download-firmware -l` | List all available firmware files |
+| `rattusboard-download-firmware -a` | Download all firmware variants |
+| `rattusboard-dev` | Show help and available tools |
+
+#### Manual Firmware Testing
+
+If you want to test a specific firmware file or use alternate firmware:
+
+```bash
+# Download a specific firmware file
+rattusboard-download-firmware rattusboard_left.uf2
+
+# Test specific firmware 
+rattusboard-test-firmware -s rattusboard_left.uf2
+
+# Download from a specific release tag
+rattusboard-download-firmware --tag v1.2.0 rattusboard_default.uf2
+
+# Force re-download latest firmware
+rattusboard-download-firmware -f
+```
+
+#### Interactive Renode Testing
+
+In interactive mode, you can test various keyboard functions:
+
+```bash
+# Start interactive session
+rattusboard-test-firmware -i
+
+# Available test commands in Renode:
+test_matrix_left      # Test left half key matrix
+test_matrix_right     # Test right half key matrix  
+test_trackball        # Test PMW3360 trackball sensor
+test_encoder          # Test rotary encoder
+configure_left        # Switch to left half mode
+configure_right       # Switch to right half mode
+demo_keyboard_sequence # Run full demo sequence
+```
+
+#### Troubleshooting
+
+**Firmware Download Issues:**
+- Check internet connection in Codespace
+- Try `rattusboard-download-firmware -f` to force re-download
+- Use `rattusboard-download-firmware -l` to see available files
+- Manually download from [Releases](https://github.com/Rattus-ukrizovany/RattusBoard/releases/latest) if needed
+
+**Renode Simulation Issues:**
+- Ensure firmware compiled successfully: `qmk compile -kb rattusboard -km default`
+- Check ELF file exists: `ls -la .build/rattusboard_default.elf`
+- Try test-only mode: `rattusboard-test-firmware -t`
+- Restart with fresh firmware: `rattusboard-test-firmware -f`
+
+**Common Error Solutions:**
+- "ELF file not found" → Run `qmk compile -kb rattusboard -km default` first
+- "Download failed" → Check network, try `-f` flag to force download
+- "Renode not found" → Environment setup incomplete, restart Codespace
+- "Permission denied" → Scripts should be executable in devcontainer
+
+**Manual Troubleshooting Steps:**
+```bash
+# Check environment status
+rattusboard-dev
+
+# Verify tools are installed
+renode --version
+qmk --version
+
+# Test environment
+.devcontainer/test-environment.sh
+
+# Manual firmware compile
+qmk compile -kb rattusboard -km default
+
+# Manual Renode start
+renode sim/rattusboard.resc
+```
+
+#### Development Workflow
+
+The virtual environment is perfect for:
+- **Firmware Testing**: Test changes without flashing hardware
+- **Feature Development**: Iterate quickly on new features  
+- **Bug Reproduction**: Simulate specific scenarios
+- **Learning**: Understand keyboard firmware behavior
+- **Collaboration**: Share reproducible test environments
+
+For hardware development and final validation, you'll still need to flash the actual RattusBoard, but this virtual environment handles most development and testing needs.
+
+---
+
 ## 🤝 Contributing
 
 - Bug reports, feature requests, documentation, code, and build photos are welcome!
