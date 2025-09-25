@@ -3,7 +3,7 @@
 
 # Load platform and show system info
 mach create "rattusboard_test"
-machine LoadPlatformDescription @sim/rattusboard.repl
+machine LoadPlatformDescription @rattusboard.repl
 
 echo "=== RattusBoard Simulation Test ==="
 echo "Platform loaded successfully!"
