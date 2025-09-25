@@ -1,0 +1,53 @@
+{
+	"name": "RattusBoard Development Environment",
+	"build": {
+		"dockerfile": "Dockerfile",
+		"context": ".."
+	},
+	"features": {},
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-vscode.cpptools",
+				"ms-python.python",
+				"ms-dotnettools.csharp",
+				"QMK.qmk",
+				"ms-vscode.cmake-tools",
+				"ms-vscode.makefile-tools",
+				"redhat.vscode-yaml",
+				"ms-vscode.vscode-json"
+			],
+			"settings": {
+				"terminal.integrated.defaultProfile.linux": "bash",
+				"files.associations": {
+					"*.resc": "csharp",
+					"*.repl": "yaml"
+				},
+				"C_Cpp.default.compilerPath": "/usr/bin/arm-none-eabi-gcc",
+				"C_Cpp.default.includePath": [
+					"${workspaceFolder}/keyboards/rattusboard/**",
+					"/opt/pico-sdk/src/**",
+					"${workspaceFolder}/**"
+				],
+				"python.defaultInterpreterPath": "/usr/bin/python3",
+				"cmake.configureOnOpen": false
+			}
+		}
+	},
+	"forwardPorts": [],
+	"postCreateCommand": [
+		"bash",
+		"-c",
+		"echo 'Setting up RattusBoard development environment...' && qmk setup -y && echo 'Environment ready! Run: qmk compile -kb rattusboard -km default && renode sim/rattusboard.resc'"
+	],
+	"remoteUser": "developer",
+	"workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+	"workspaceFolder": "/workspace",
+	"mounts": [
+		"source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+	],
+	"containerEnv": {
+		"QMK_HOME": "/workspace",
+		"PICO_SDK_PATH": "/opt/pico-sdk"
+	}
+}
