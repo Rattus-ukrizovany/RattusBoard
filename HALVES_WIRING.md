@@ -599,11 +599,32 @@ for (uint8_t col = 0; col < MATRIX_COLS; col++) {
 }
 ```
 
+**ZMK Configuration Example:**
+```yaml
+# Example ZMK matrix_pins configuration
+rows:
+  - GP2  # Row 0 (grid bottom)
+  - GP3  # Row 1
+  - GP4  # Row 2 (grid top)
+  - GP5  # Row 3 (thumbs)
+columns:
+  - GP15
+  - GP16
+  - GP17
+  - GP18
+  - GP19
+  - GP20
+```
+
 **Key Changes:**
 - **MATRIX_ROWS = 4** (3 main + 1 thumb row)
 - **MATRIX_COLS = 6** (6 columns per half)
 - **New thumb cluster arrangement** - asymmetric placement
 - **Simplified scanning** - no column offset logic needed
+- **Matrix order in firmware must match row/col wiring above**
+- **Thumb keys:** are assigned to row 3 in your keymap, sharing columns with the main grid
+
+```c
 if (isLeftHand) {
     col_start = 0;
     col_end = MATRIX_COLS / 2;  // Columns 0-2
@@ -614,6 +635,25 @@ else {
     col_end = MATRIX_COLS;      // Columns 3-5
 }
 ```
+
+---
+
+## 🛠️ Best Practices & Tips
+
+### Assembly Best Practices
+- Test matrix continuity before powering up
+- Keep all GND connections solid and continuous  
+- Confirm all trackball/encoder SPI lines match firmware
+- Use a shielded TRRS cable for split serial and power
+- Install components gradually, testing each subsystem
+- For custom features, see your firmware's split documentation
+
+### Firmware Compatibility Notes
+- **Matrix order in firmware must match row/col wiring above**
+- **Rows:** `[GP2, GP3, GP4, GP5]` (grid bottom → grid top, then thumbs)
+- **Columns:** `[GP15–GP20]` (unified for both halves)
+- Compatible with both QMK and ZMK firmware
+- Use the same firmware binary for both halves
 
 ---
 
