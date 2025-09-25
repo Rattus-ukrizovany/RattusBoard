@@ -12,7 +12,32 @@ The RattusBoard simulation environment provides:
 
 ## Quick Start
 
-### Option 1: Using Docker (Recommended)
+### Option 1: GitHub Codespaces (Recommended)
+
+The easiest way to get started is using GitHub Codespaces with our pre-configured development environment:
+
+1. **Open in Codespaces**: Click the green "Code" button in the GitHub repository and select "Open with Codespaces"
+2. **Wait for setup**: The environment will automatically install QMK, Renode, and all dependencies (~2-3 minutes)
+3. **Compile firmware**: Run `qmk compile -kb rattusboard -km default`
+4. **Start simulation**: Run `renode sim/rattusboard.resc`
+
+```bash
+# Quick commands for Codespaces:
+qmk compile -kb rattusboard -km default
+renode sim/rattusboard.resc
+
+# Or use the helper script:
+rattusboard-dev
+```
+
+**Features included in Codespaces:**
+- ✅ Pre-installed Renode 1.14.0 with RP2040 support
+- ✅ QMK CLI and ARM toolchain ready to use
+- ✅ VS Code extensions for C/C++, Python, and QMK
+- ✅ Configured workspace with proper paths and settings
+- ✅ One-click setup - no local installation required
+
+### Option 2: Using Docker
 
 ```bash
 # Build the development environment
@@ -28,7 +53,7 @@ docker run -it --rm \
 renode sim/rattusboard.resc
 ```
 
-### Option 2: Local Installation
+### Option 3: Local Installation
 
 ```bash
 # Install Renode (Linux)
@@ -356,6 +381,79 @@ The simulation environment can be used in CI/CD pipelines:
       qmk compile -kb rattusboard -km default &&
       renode --disable-xwt --console rattusboard.resc --execute 'sysbus LoadELF @.build/rattusboard_default.elf; start; sleep 5; quit'
     "
+```
+
+## GitHub Codespaces Usage
+
+### Getting Started with Codespaces
+
+GitHub Codespaces provides a cloud-based development environment that's pre-configured for RattusBoard development:
+
+1. **Create Codespace**:
+   - Go to the RattusBoard repository on GitHub
+   - Click the green "Code" button
+   - Select "Codespaces" tab
+   - Click "Create codespace on main"
+
+2. **Wait for Setup**:
+   - The environment automatically installs all dependencies
+   - QMK, Renode, and ARM toolchain are ready to use
+   - VS Code opens with recommended extensions
+
+3. **Start developing**:
+   ```bash
+   # Test the environment (optional)
+   .devcontainer/test-environment.sh
+   
+   # Compile the default firmware
+   qmk compile -kb rattusboard -km default
+   
+   # Start Renode simulation
+   renode sim/rattusboard.resc
+   
+   # Load firmware in Renode console:
+   sysbus LoadELF @.build/rattusboard_default.elf
+   start
+   ```
+
+### Codespaces Features
+
+- **Pre-configured VS Code**: Extensions for C/C++, Python, QMK, and YAML
+- **Syntax highlighting**: Custom file associations for `.resc` and `.repl` files
+- **Integrated terminal**: Bash with development tools in PATH
+- **Workspace settings**: Properly configured include paths and compiler settings
+- **Persistent storage**: Your changes are saved between sessions
+
+### Troubleshooting Codespaces
+
+**Environment not ready?**
+```bash
+# Check if QMK is available
+qmk --version
+
+# Check if Renode is available
+renode --version
+
+# Verify ARM compiler
+arm-none-eabi-gcc --version
+```
+
+**Compilation issues?**
+```bash
+# Ensure QMK is set up
+qmk setup -y
+
+# Set the correct keyboard home
+export QMK_HOME=/workspace
+```
+
+**Simulation not starting?**
+```bash
+# Check simulation files exist
+ls -la sim/
+
+# Start with verbose output
+renode -v sim/rattusboard.resc
 ```
 
 ## Contributing
