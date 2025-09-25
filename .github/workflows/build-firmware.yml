@@ -21,8 +21,10 @@ jobs:
       with:
         python-version: '3.x'
 
-    - name: Install QMK CLI
+    - name: Install build dependencies
       run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc-arm-none-eabi
         pip3 install qmk
         qmk --version
 
