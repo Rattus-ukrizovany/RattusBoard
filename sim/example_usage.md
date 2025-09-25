@@ -107,15 +107,14 @@ monitor gpio.matrix_row0
 
 For development reference, here's the complete pin mapping:
 
-**Matrix (Both Halves)**:
+**Matrix (Both Halves - Unified)**:
 - Rows: GP2, GP3, GP4, GP5
+- Columns: GP15, GP16, GP17, GP18, GP19, GP20 (same for both halves)
 
 **Left Half**:
-- Columns: GP9, GP10, GP11, GP12, GP13, GP14
 - Hand detect: GP21 → GND (low)
 
 **Right Half**:
-- Columns: GP15, GP16, GP17, GP18, GP19, GP20  
 - Hand detect: GP21 → Float (high)
 - PMW3360: CS=GP22, SCK=GP23, MOSI=GP24, MISO=GP25
 - Encoder: A=GP26, B=GP27

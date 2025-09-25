@@ -37,12 +37,12 @@ USER
 | GP3   | Row 1      | Main grid middle row                         |
 | GP4   | Row 2      | Main grid top row                            |
 | GP5   | Row 3      | Thumb row (all 3 thumb keys)                 |
-| GP9   | Col 0      | Leftmost column                              |
-| GP10  | Col 1      | Column 1                                     |
-| GP11  | Col 2      | Column 2                                     |
-| GP12  | Col 3      | Column 3                                     |
-| GP13  | Col 4      | Column 4                                     |
-| GP14  | Col 5      | Rightmost column                             |
+| GP15  | Col 0      | Leftmost column                              |
+| GP16  | Col 1      | Column 1                                     |
+| GP17  | Col 2      | Column 2                                     |
+| GP18  | Col 3      | Column 3                                     |
+| GP19  | Col 4      | Column 4                                     |
+| GP20  | Col 5      | Rightmost column                             |
 | GP1   | Split RX/TX| TRRS Tip (serial to right half)              |
 | GP21  | Hand detect| Connect to GND (marks as left/master)        |
 | 3.3V  | Power      | TRRS Ring 2 (powers right half)              |
@@ -119,7 +119,7 @@ USER
 
 - **Matrix order in firmware must match row/col wiring above.**
 - **Rows:** `[GP2, GP3, GP4, GP5]` (grid bottom → grid top, then thumbs)
-- **Columns:** `[GP9–GP14]` (left half), `[GP15–GP20]` (right half)
+- **Columns:** `[GP15–GP20]` (unified for both halves)
 - **Thumb keys:** are assigned to row 3 in your keymap, sharing columns with the main grid.
 
 Example ZMK `matrix_pins:` (left):
@@ -130,12 +130,12 @@ rows:
   - GP4  # Row 2 (grid top)
   - GP5  # Row 3 (thumbs)
 columns:
-  - GP9
-  - GP10
-  - GP11
-  - GP12
-  - GP13
-  - GP14
+  - GP15
+  - GP16
+  - GP17
+  - GP18
+  - GP19
+  - GP20
 ```
 
 ---
