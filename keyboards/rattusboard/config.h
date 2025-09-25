@@ -4,7 +4,7 @@
 #pragma once
 
 /* key matrix size - QMK standard split format */
-#define MATRIX_ROWS 4
+#define MATRIX_ROWS 8
 #define MATRIX_COLS 6
 
 /* 
