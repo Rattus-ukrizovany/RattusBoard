@@ -9,7 +9,7 @@
   "debounce": 5,
   "matrix_pins": {
     "rows": ["GP2", "GP3", "GP4", "GP5"],
-    "cols": ["GP9", "GP10", "GP11", "GP12", "GP13", "GP14"]
+    "cols": ["GP15", "GP16", "GP17", "GP18", "GP19", "GP20"]
   },
   "split": {
     "enabled": true,

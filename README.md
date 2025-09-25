@@ -43,7 +43,7 @@ See the previous README for detailed specs, or consult the wiring guides for pin
 
 ## 🛠️ Build Guide
 
-Follow the wiring diagrams and pin assignments in the repo. Each half has independent matrix wiring and uses the GP16 pin for hand detection (see below).
+Follow the wiring diagrams and pin assignments in the repo. Each half has independent matrix wiring and uses the GP21 pin for hand detection (see below).
 
 ---
 
@@ -53,7 +53,7 @@ Follow the wiring diagrams and pin assignments in the repo. Each half has indepe
 **You only need to flash ONE firmware file (`rattusboard_default.uf2`) to both halves of your keyboard.**
 
 #### How RattusBoard's Split Detection Works
-- **Hardware hand detection**: Using the GP16 pin, the keyboard auto-detects which half is left or right. (GP16 connected to GND = left/master, GP16 floating = right/slave.)
+- **Hardware hand detection**: Using the GP21 pin, the keyboard auto-detects which half is left or right. (GP21 connected to GND = left/master, GP21 floating = right/slave.)
 - **Same firmware file**: No need to build or download separate left/right .uf2 files. The firmware is designed to work out-of-the-box for both halves.
 - **Peripherals**: Trackball and encoder are on the right half; the firmware automatically enables their functions only on the correct side.
 
@@ -79,7 +79,7 @@ Follow the wiring diagrams and pin assignments in the repo. Each half has indepe
 - If one half doesn't work:
   - Check TRRS cable and jacks
   - Ensure both halves flashed with SAME firmware file
-  - Verify GP16 hand detection wiring on each half
+  - Verify GP21 hand detection wiring on each half
   - Use online key tester or QMK debug output for diagnosis
 - No need to rebuild or reflash separate files unless pursuing advanced development.
 

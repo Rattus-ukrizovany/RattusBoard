@@ -3,30 +3,26 @@
 
 #pragma once
 
-/* key matrix size - QMK standard split format */
-#define MATRIX_ROWS 8
+/* key matrix size - unified 4x6 matrix per half */
+#define MATRIX_ROWS 4
 #define MATRIX_COLS 6
 
 /* 
  * Keyboard Matrix Assignments (Raspberry Pi Pico / RP2040)
  * 
- * New Layout: 3x6 main grid + thumb row (row 3)
- * Matrix per half: 4 rows x 6 columns
+ * New Layout: unified 4x6 matrix per half (3 main rows + 1 thumb row)
+ * Each half uses the same pin assignments:
  * 
  * Thumb cluster arrangement:
  * - Left half: columns 3, 4, 5
  * - Right half: columns 0, 1, 2
  * 
- * Left Half (Master):
- * - Rows: GP2, GP3, GP4, GP5 (row 3 = thumbs)
- * - Cols: GP9, GP10, GP11, GP12, GP13, GP14
- * 
- * Right Half (Slave):
+ * Both Halves (unified pins):
  * - Rows: GP2, GP3, GP4, GP5 (row 3 = thumbs)
  * - Cols: GP15, GP16, GP17, GP18, GP19, GP20
  */
 #define MATRIX_ROW_PINS { GP2, GP3, GP4, GP5 }
-#define MATRIX_COL_PINS { GP9, GP10, GP11, GP12, GP13, GP14 }
+#define MATRIX_COL_PINS { GP15, GP16, GP17, GP18, GP19, GP20 }
 
 /* COL2ROW, ROW2COL */
 #define DIODE_DIRECTION COL2ROW

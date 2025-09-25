@@ -25,7 +25,7 @@ Left Half (Master)                    Right Half (Slave)
 │  Raspberry Pi Pico  │◄─── TRRS ───►│  Raspberry Pi Pico  │
 │                     │              │                     │
 │  MATRIX 4×6         │              │  MATRIX 4×6         │
-│  Cols: GP9-GP14     │              │  Cols: GP15-GP20    │
+│  Cols: GP15-GP20    │              │  Cols: GP15-GP20    │
 │  Rows: GP2-GP5      │              │  Rows: GP2-GP5      │
 │                     │              │                     │
 │  Split Pin: GP21→GND│              │  Split Pin: GP21    │
@@ -42,7 +42,8 @@ Left Half (Master)                    Right Half (Slave)
 ```
 
 **NEW MATRIX DESIGN:**
-- **4×6 Matrix per half** - 3 main rows + 1 thumb row
+- **Unified 4×6 Matrix per half** - 3 main rows + 1 thumb row
+- **Same pin assignments** - Both halves use identical pins: GP15-GP20 for columns
 - **42 Total Keys** - 21 per half  
 - **Thumb Cluster**: Left (cols 3,4,5), Right (cols 0,1,2)
 - **TRRS Communication** - Only for coordination between halves via GP1
@@ -113,7 +114,7 @@ Row 2  ⊞  ──  ⊞  ──  ⊞  ──  ⊞  ──  ⊞  ──  ⊞     
        │      │      │      │      │      │  
 Row 3  ---    ---    ---    ⊞  ──  ⊞  ──  ⊞     GP5 (Thumb cluster)
        │      │      │      │      │      │  
-      GP9    GP10   GP11   GP12   GP13   GP14
+      GP15   GP16   GP17   GP18   GP19   GP20
 ```
 
 **Detailed Connections:**
@@ -123,11 +124,12 @@ Row 1: GP3  → All switches in second row (K10-K15)
 Row 2: GP4  → All switches in third row (K20-K25)
 Row 3: GP5  → Thumb cluster switches (K33, K34, K35)
 
-Col 0: GP9  → All switches in column 0 (K00, K10, K20)
-Col 1: GP10 → All switches in column 1 (K01, K11, K21)
-Col 2: GP11 → All switches in column 2 (K02, K12, K22)
-Col 3: GP12 → All switches in column 3 (K03, K13, K23, K33)
-Col 4: GP13 → All switches in column 4 (K04, K14, K24, K34)
+Col 0: GP15 → All switches in column 0 (K00, K10, K20)
+Col 1: GP16 → All switches in column 1 (K01, K11, K21)
+Col 2: GP17 → All switches in column 2 (K02, K12, K22)
+Col 3: GP18 → All switches in column 3 (K03, K13, K23, K33)
+Col 4: GP19 → All switches in column 4 (K04, K14, K24, K34)
+Col 5: GP20 → All switches in column 5 (K05, K15, K25, K35)
 ```
 
 ### 🔧 Critical Configuration
@@ -456,8 +458,8 @@ qmk console
 
 3. **Hand Detection Verification**:
    ```
-   Left half: GP16 should read 0V (connected to GND)
-   Right half: GP16 should read 3.3V (floating, pulled up)
+   Left half: GP21 should read 0V (connected to GND)
+   Right half: GP21 should read 3.3V (floating, pulled up)
    ```
 
 **Common Solutions:**
@@ -541,13 +543,13 @@ qmk console
 | Row 1 | GP3 | GP3 | **Independent pins** |
 | Row 2 | GP4 | GP4 | **Independent pins** |
 | Row 3 (Thumbs) | GP5 | GP5 | **Independent pins** |
-| **Matrix (Columns) - NEW 4×6 LAYOUT** |
-| Column 0 | GP9 | GP15 | **Fully independent** |
-| Column 1 | GP10 | GP16 | **Fully independent** |
-| Column 2 | GP11 | GP17 | **Fully independent** |
-| Column 3 | GP12 | GP18 | **Fully independent** |
-| Column 4 | GP13 | GP19 | **Fully independent** |
-| Column 5 | GP14 | GP20 | **Fully independent** |
+| **Matrix (Columns) - UNIFIED 4×6 LAYOUT** |
+| Column 0 | GP15 | GP15 | **Unified pins** |
+| Column 1 | GP16 | GP16 | **Unified pins** |
+| Column 2 | GP17 | GP17 | **Unified pins** |
+| Column 3 | GP18 | GP18 | **Unified pins** |
+| Column 4 | GP19 | GP19 | **Unified pins** |
+| Column 5 | GP20 | GP20 | **Unified pins** |
 | **Trackball (SPI)** |
 | CS (Chip Select) | - | GP22 | SPI control |
 | SCK (Serial Clock) | - | GP23 | SPI clock |
@@ -568,7 +570,7 @@ qmk console
 #define MATRIX_COLS 6
 
 #define MATRIX_ROW_PINS { GP2, GP3, GP4, GP5 }
-#define MATRIX_COL_PINS { GP15, GP16, GP17, GP9, GP10, GP11 }
+#define MATRIX_COL_PINS { GP15, GP16, GP17, GP18, GP19, GP20 }
 #define DIODE_DIRECTION COL2ROW
 
 // Split configuration  
@@ -606,7 +608,7 @@ if (isLeftHand) {
     col_start = 0;
     col_end = MATRIX_COLS / 2;  // Columns 0-2
 }
-// Right half: scan columns 3-5 (GP12-GP14) 
+// Right half: scan columns 3-5 (GP18-GP20) 
 else {
     col_start = MATRIX_COLS / 2;
     col_end = MATRIX_COLS;      // Columns 3-5

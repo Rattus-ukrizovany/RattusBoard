@@ -77,7 +77,7 @@ The simulation accurately models the RattusBoard hardware based on `config.h` an
 ### Left Half (Master)
 - **MCU**: RP2040 (Raspberry Pi Pico)
 - **Matrix Rows**: GP2, GP3, GP4, GP5 (4 rows)
-- **Matrix Cols**: GP9, GP10, GP11, GP12, GP13, GP14 (6 columns)
+- **Matrix Cols**: GP15, GP16, GP17, GP18, GP19, GP20 (6 columns)
 - **Split Communication**: GP1 (SOFT_SERIAL_PIN)
 - **Hand Detection**: GP21 → GND (identifies as left half)
 - **USB Connection**: Native USB for host communication
