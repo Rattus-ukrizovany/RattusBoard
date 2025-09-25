@@ -31,7 +31,7 @@ Just want to build and use?
 ### ⚙️ **Customizers**
 Want to modify layouts?
 - 🎹 **[Vial App](https://get.vial.today/)** (Live editing)
-- 📝 **[Default Keymap](keymaps/default/keymap.c)**
+- 📝 **[Default Keymap](keyboards/rattusboard/keymaps/default/keymap.c)**
 - 🔑 **[Layer Documentation](#-keymap--layers)**
 
 </td>
@@ -306,8 +306,8 @@ qmk compile -kb rattusboard -km vial
 - **8 Layers Available:** Expand beyond defaults
 
 ### 📚 **Resources**
-- **[Default Keymap Source](keymaps/default/keymap.c)**
-- **[Vial Keymap Source](keymaps/vial/keymap.c)**
+- **[Default Keymap Source](keyboards/rattusboard/keymaps/default/keymap.c)**
+- **[Vial Keymap Source](keyboards/rattusboard/keymaps/vial/keymap.c)**
 - **[Pin Mappings](HALVES_WIRING.md)**
 
 </td>
