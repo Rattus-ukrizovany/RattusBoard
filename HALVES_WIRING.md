@@ -211,16 +211,7 @@ Col 2: GP17 → All switches in column 2 (K08, K18, K28, K32)
 Col 3: GP18 → All switches in column 3 (K09, K19, K29)
 Col 4: GP19 → All switches in column 4 (K0A, K1A, K2A)
 Col 5: GP20 → All switches in column 5 (K0B, K1B, K2B)
-Row 1: GP3  → All switches in second row  
-Row 2: GP4  → All switches in third row
-Row 3: GP5  → All switches in fourth row
-Row 4: GP6  → All switches in fifth row
-Row 5: GP7  → All switches in bottom row
-Row 6: GP8  → All thumb cluster switches
 
-Col 0: GP12 → All switches in leftmost column (right half)
-Col 1: GP13 → All switches in middle column (right half)  
-Col 2: GP14 → All switches in rightmost column (right half)
 ```
 
 ### 🔧 Critical Configuration
