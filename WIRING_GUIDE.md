@@ -1,6 +1,6 @@
 # 🔌 RattusBoard Split Wiring Guide
 
-_This guide describes the physical matrix and microcontroller wiring for the RattusBoard split keyboard, matching the 3x6+3 layout in [image4](image4). It is designed for compatibility with ZMK/QMK firmware._
+_This guide describes the physical matrix and microcontroller wiring for the RattusBoard split keyboard, matching the 3x6+3 layout. It is designed for compatibility with ZMK/QMK firmware._
 
 ---
 
@@ -150,4 +150,4 @@ columns:
 
 ---
 
-*See README.md for firmware setup. Pinouts and logic match [image4](image4) and are ready for ZMK/QMK!*
+*See README.md for firmware setup.
