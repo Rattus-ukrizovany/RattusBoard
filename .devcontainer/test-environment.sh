@@ -56,25 +56,40 @@ else
     failed=1
 fi
 
-# Test 3: Try QMK setup (non-destructive)
+# Test 3: Check QMK setup status
 echo ""
-echo "⚙️  Testing QMK setup..."
-if QMK_HOME=/workspace qmk setup --yes 2>/dev/null; then
-    echo "✅ QMK setup successful"
+echo "⚙️  Checking QMK setup status..."
+if [ -d "qmk_firmware" ] && [ -d "qmk_firmware/quantum" ]; then
+    echo "✅ QMK firmware repository found"
+    if [ -L "qmk_firmware/keyboards/rattusboard" ] || [ -d "qmk_firmware/keyboards/rattusboard" ]; then
+        echo "✅ RattusBoard keyboard configuration linked"
+        QMK_SETUP_OK=true
+    else
+        echo "⚠️  RattusBoard keyboard not linked to QMK firmware"
+        QMK_SETUP_OK=false
+    fi
 else
-    echo "⚠️  QMK setup may need manual intervention"
+    echo "⚠️  QMK firmware not set up. Run 'bash setup-qmk.sh' to initialize"
+    QMK_SETUP_OK=false
 fi
 
 # Test 4: Test compilation (if environment is fully set up)
 echo ""
 echo "🔨 Testing firmware compilation..."
-if QMK_HOME=/workspace qmk compile -kb rattusboard -km default 2>/dev/null; then
-    echo "✅ Firmware compilation successful"
-    if [ -f ".build/rattusboard_default.elf" ]; then
-        echo "✅ Firmware binary created"
+if [ "$QMK_SETUP_OK" = true ]; then
+    cd "qmk_firmware" 2>/dev/null || cd /workspace
+    if qmk compile -kb rattusboard -km default 2>/dev/null; then
+        echo "✅ Firmware compilation successful"
+        if [ -f ".build/rattusboard_default.elf" ]; then
+            echo "✅ Firmware binary created"
+        fi
+    else
+        echo "⚠️  Firmware compilation failed"
+        failed=1
     fi
+    cd /workspace 2>/dev/null || cd - >/dev/null
 else
-    echo "⚠️  Firmware compilation failed (may need QMK setup)"
+    echo "⚠️  Skipping compilation test - QMK not properly set up"
 fi
 
 # Summary
@@ -91,7 +106,7 @@ else
     echo "⚠️  Some tests failed. Please check the setup."
     echo ""
     echo "Troubleshooting:"
-    echo "  - Try running: qmk setup -y"
+    echo "  - Run: bash setup-qmk.sh   # Set up QMK firmware"
     echo "  - Check if you're in the correct directory: /workspace"
     echo "  - Restart the Codespace if issues persist"
 fi
