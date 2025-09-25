@@ -38,7 +38,7 @@
 	"postCreateCommand": [
 		"bash",
 		"-c",
-		"echo 'Setting up RattusBoard development environment...' && qmk setup -y && echo 'Environment ready! Test with: .devcontainer/test-environment.sh' && echo 'Quick start: qmk compile -kb rattusboard -km default && renode sim/rattusboard.resc'"
+		"echo 'Setting up RattusBoard development environment...' && qmk setup -y && echo 'Downloading latest firmware...' && rattusboard-download-firmware || echo 'Warning: Firmware download failed, but environment is ready' && echo 'Environment ready! Quick start: rattusboard-test-firmware' && echo 'For help: rattusboard-dev'"
 	],
 	"remoteUser": "developer",
 	"workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
