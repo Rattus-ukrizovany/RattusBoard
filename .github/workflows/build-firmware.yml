@@ -1,6 +1,5 @@
 name: Build RattusBoard Firmware
-on:
-  workflow_dispatch:
+
 # Trigger on push to main and on pull requests
 on:
   push:
