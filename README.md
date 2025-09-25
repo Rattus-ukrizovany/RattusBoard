@@ -26,13 +26,55 @@ RattusBoard is a cutting-edge split ergonomic keyboard designed for productivity
 
 ## 📋 Hardware Specifications
 
-See the previous README for detailed specs, or consult the wiring guides for pinouts and matrix info.
+### Matrix Configuration
+- **Layout**: 3×6 main grid + 3-key thumb cluster per half
+- **Total Keys**: 42 (21 per half)
+- **Matrix Size**: 4 rows × 6 columns per half
+- **Diode Direction**: COL2ROW
+- **Thumb Cluster**:
+  - Left half: Row 3, Columns 3, 4, 5
+  - Right half: Row 3, Columns 0, 1, 2
+
+### Matrix Tables
+
+**Left Half Matrix:**
+```
+     Col0 Col1 Col2 Col3 Col4 Col5
+Row0  K00  K01  K02  K03  K04  K05
+Row1  K10  K11  K12  K13  K14  K15  
+Row2  K20  K21  K22  K23  K24  K25
+Row3  ---  ---  ---  K33  K34  K35  (Thumb cluster)
+```
+
+**Right Half Matrix:**
+```
+     Col0 Col1 Col2 Col3 Col4 Col5
+Row0  K06  K07  K08  K09  K0A  K0B
+Row1  K16  K17  K18  K19  K1A  K1B
+Row2  K26  K27  K28  K29  K2A  K2B
+Row3  K30  K31  K32  ---  ---  ---  (Thumb cluster)
+```
+
+### Hardware Components
+- **Microcontroller**: Raspberry Pi Pico (RP2040)
+- **Trackball**: PMW3360 sensor (right half only)
+- **Encoder**: Rotary encoder (right half only)
+- **Communication**: TRRS cable between halves
 
 ---
 
 ## 🛠️ Build Guide
 
-Follow the wiring diagrams and pin assignments in the repo. Each half has independent matrix wiring and uses the GP16 pin for hand detection (see below).
+Follow the wiring diagrams and pin assignments in the repo. Each half has independent matrix wiring and uses the GP21 pin for hand detection.
+
+### Pin Assignment Summary
+- **Split Detection**: GP21 (GP21→GND = Left/Master, GP21 floating = Right/Slave)
+- **Matrix Rows**: GP2, GP3, GP4, GP5 (4 rows total)
+- **Left Half Columns**: GP9, GP10, GP11, GP12, GP13, GP14 (6 columns)
+- **Right Half Columns**: GP15, GP16, GP17, GP18, GP19, GP20 (6 columns)
+- **TRRS Communication**: GP1
+
+Detailed wiring instructions are available in [HALVES_WIRING.md](HALVES_WIRING.md).
 
 ---
 
@@ -42,7 +84,7 @@ Follow the wiring diagrams and pin assignments in the repo. Each half has indepe
 **You only need to flash ONE firmware file (`rattusboard_default.uf2`) to both halves of your keyboard.**
 
 #### How RattusBoard's Split Detection Works
-- **Hardware hand detection**: Using the GP16 pin, the keyboard auto-detects which half is left or right. (GP16 connected to GND = left/master, GP16 floating = right/slave.)
+- **Hardware hand detection**: Using the GP21 pin, the keyboard auto-detects which half is left or right. (GP21 connected to GND = left/master, GP21 floating = right/slave.)
 - **Same firmware file**: No need to build or download separate left/right .uf2 files. The firmware is designed to work out-of-the-box for both halves.
 - **Peripherals**: Trackball and encoder are on the right half; the firmware automatically enables their functions only on the correct side.
 

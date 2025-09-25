@@ -24,33 +24,34 @@ Left Half (Master)                    Right Half (Slave)
 │    [USB-C INPUT]    │              │                     │
 │  Raspberry Pi Pico  │◄─── TRRS ───►│  Raspberry Pi Pico  │
 │                     │              │                     │
-│  INDEPENDENT 3×7    │              │  INDEPENDENT 3×7    │
-│  Cols: GP9-GP11     │              │  Cols: GP12-GP14    │
-│  Rows: GP2-GP8      │              │  Rows: GP2-GP8      │
+│  MATRIX 4×6         │              │  MATRIX 4×6         │
+│  Cols: GP9-GP14     │              │  Cols: GP15-GP20    │
+│  Rows: GP2-GP5      │              │  Rows: GP2-GP5      │
 │                     │              │                     │
-│  Split Pin: GP16→GND│              │  Split Pin: GP16    │
+│  Split Pin: GP21→GND│              │  Split Pin: GP21    │
 │  TRRS: GP1          │              │  TRRS: GP1          │
 │                     │              │                     │
 │                     │              │  [PMW3360 SENSOR]   │
-│                     │              │  SPI: GP17-GP20     │
+│                     │              │  SPI: GP22-GP25     │
 │                     │              │                     │
 │                     │              │  [ROTARY ENCODER]   │
-│                     │              │  Pins: GP21-GP22    │
+│                     │              │  Pins: GP26-GP27    │
 └─────────────────────┘              └─────────────────────┘
         MASTER                              SLAVE
      (USB Connected)                    (TRRS Powered)
 ```
 
-**FULLY INDEPENDENT DESIGN:**
-- **NO SHARED MATRIX PINS** - Each half has its own dedicated rows and columns
-- **Independent Scanning** - Each microcontroller only manages its own 3×7 matrix
+**NEW MATRIX DESIGN:**
+- **4×6 Matrix per half** - 3 main rows + 1 thumb row
+- **42 Total Keys** - 21 per half  
+- **Thumb Cluster**: Left (cols 3,4,5), Right (cols 0,1,2)
 - **TRRS Communication** - Only for coordination between halves via GP1
 
 **Signal Flow:**
 ```
 Computer ──USB-C──► Left Pico ──TRRS──► Right Pico
                         │                    │
-                   Matrix 3×7           Matrix 3×7
+                   Matrix 4×6           Matrix 4×6
                  (Independent)        (Independent)
                                            │
                                     ┌─────────────┐
@@ -99,48 +100,41 @@ TRRS Jack          Raspberry Pi Pico
 
 ### 🎯 Matrix Connections
 
-**Row Pins (Shared signal names with right half):**
+**New 4×6 Matrix Layout (Left Half):**
 ```
     Switch Matrix Layout (Left Half)
     
-    Col 0   Col 1   Col 2
-Row 0  ⊞  ──  ⊞  ──  ⊞     GP2
-       │      │      │  
-Row 1  ⊞  ──  ⊞  ──  ⊞     GP3
-       │      │      │  
-Row 2  ⊞  ──  ⊞  ──  ⊞     GP4
-       │      │      │  
-Row 3  ⊞  ──  ⊞  ──  ⊞     GP5
-       │      │      │  
-Row 4  ⊞  ──  ⊞  ──  ⊞     GP6
-       │      │      │  
-Row 5  ⊞  ──  ⊞  ──  ⊞     GP7
-       │      │      │  
-Row 6     ⊞     ⊞  ──      GP8 (Thumbs)
-       │      │      │  
-      GP9    GP10   GP11
+    Col 0   Col 1   Col 2   Col 3   Col 4   Col 5
+Row 0  ⊞  ──  ⊞  ──  ⊞  ──  ⊞  ──  ⊞  ──  ⊞     GP2
+       │      │      │      │      │      │  
+Row 1  ⊞  ──  ⊞  ──  ⊞  ──  ⊞  ──  ⊞  ──  ⊞     GP3
+       │      │      │      │      │      │  
+Row 2  ⊞  ──  ⊞  ──  ⊞  ──  ⊞  ──  ⊞  ──  ⊞     GP4
+       │      │      │      │      │      │  
+Row 3  ---    ---    ---    ⊞  ──  ⊞  ──  ⊞     GP5 (Thumb cluster)
+       │      │      │      │      │      │  
+      GP9    GP10   GP11   GP12   GP13   GP14
 ```
 
 **Detailed Connections:**
 ```
-Row 0: GP2  → All switches in top row
-Row 1: GP3  → All switches in second row
-Row 2: GP4  → All switches in third row
-Row 3: GP5  → All switches in fourth row
-Row 4: GP6  → All switches in fifth row
-Row 5: GP7  → All switches in bottom row
-Row 6: GP8  → All thumb cluster switches
+Row 0: GP2  → All switches in top row (K00-K05)
+Row 1: GP3  → All switches in second row (K10-K15)
+Row 2: GP4  → All switches in third row (K20-K25)
+Row 3: GP5  → Thumb cluster switches (K33, K34, K35)
 
-Col 0: GP9  → All switches in leftmost column
-Col 1: GP10 → All switches in middle column
-Col 2: GP11 → All switches in rightmost column
+Col 0: GP9  → All switches in column 0 (K00, K10, K20)
+Col 1: GP10 → All switches in column 1 (K01, K11, K21)
+Col 2: GP11 → All switches in column 2 (K02, K12, K22)
+Col 3: GP12 → All switches in column 3 (K03, K13, K23, K33)
+Col 4: GP13 → All switches in column 4 (K04, K14, K24, K34)
 ```
 
 ### 🔧 Critical Configuration
 
 **Hand Detection (Essential!):**
 ```
-GP16 ──┐
+GP21 ──┐
        │  Required for firmware to identify
        │  this half as the LEFT/MASTER
        └── GND
@@ -188,32 +182,35 @@ Left Pico GND  ──TRRS──► Right Pico GND
 
 ### 🎯 Matrix Connections
 
+**New 4×6 Matrix Layout (Right Half):**
 ```
     Switch Matrix Layout (Right Half)
     
-    Col 0   Col 1   Col 2
-Row 0  ⊞  ──  ⊞  ──  ⊞     GP2
-       │      │      │  
-Row 1  ⊞  ──  ⊞  ──  ⊞     GP3
-       │      │      │  
-Row 2  ⊞  ──  ⊞  ──  ⊞     GP4
-       │      │      │  
-Row 3  ⊞  ──  ⊞  ──  ⊞     GP5
-       │      │      │  
-Row 4  ⊞  ──  ⊞  ──  ⊞     GP6
-       │      │      │  
-Row 5  ⊞  ──  ⊞  ──  ⊞     GP7
-       │      │      │  
-Row 6     ⊞  ──  ⊞         GP8 (Thumbs)
-       │      │      │  
-      GP12   GP13   GP14
+    Col 0   Col 1   Col 2   Col 3   Col 4   Col 5
+Row 0  ⊞  ──  ⊞  ──  ⊞  ──  ⊞  ──  ⊞  ──  ⊞     GP2
+       │      │      │      │      │      │  
+Row 1  ⊞  ──  ⊞  ──  ⊞  ──  ⊞  ──  ⊞  ──  ⊞     GP3
+       │      │      │      │      │      │  
+Row 2  ⊞  ──  ⊞  ──  ⊞  ──  ⊞  ──  ⊞  ──  ⊞     GP4
+       │      │      │      │      │      │  
+Row 3  ⊞  ──  ⊞  ──  ⊞  ──  ---    ---    ---    GP5 (Thumb cluster)
+       │      │      │      │      │      │  
+      GP15   GP16   GP17   GP18   GP19   GP20
 ```
-
-**Note:** Right half columns are physically 0-2 but electrically mapped as firmware columns 3-5.
 
 **Detailed Connections:**
 ```
-Row 0: GP2  → All switches in top row
+Row 0: GP2  → All switches in top row (K06-K0B)
+Row 1: GP3  → All switches in second row (K16-K1B)
+Row 2: GP4  → All switches in third row (K26-K2B)
+Row 3: GP5  → Thumb cluster switches (K30, K31, K32)
+
+Col 0: GP15 → All switches in column 0 (K06, K16, K26, K30)
+Col 1: GP16 → All switches in column 1 (K07, K17, K27, K31)
+Col 2: GP17 → All switches in column 2 (K08, K18, K28, K32)
+Col 3: GP18 → All switches in column 3 (K09, K19, K29)
+Col 4: GP19 → All switches in column 4 (K0A, K1A, K2A)
+Col 5: GP20 → All switches in column 5 (K0B, K1B, K2B)
 Row 1: GP3  → All switches in second row  
 Row 2: GP4  → All switches in third row
 Row 3: GP5  → All switches in fourth row
@@ -230,7 +227,7 @@ Col 2: GP14 → All switches in rightmost column (right half)
 
 **Hand Detection (Essential!):**
 ```
-GP16 ────  (Leave unconnected/floating)
+GP21 ────  (Leave unconnected/floating)
     
 No connection to GND tells firmware
 this is the RIGHT/SLAVE half
@@ -244,11 +241,11 @@ PMW3360 Module     Raspberry Pi Pico
 ┌─────────────┐   ┌─────────────────┐
 │ VCC (3.3V)  │◄──│ 3.3V (from TRRS)│
 │ GND         │◄──│ GND             │
-│ CS          │◄──│ GP17            │
-│ SCK         │◄──│ GP18            │
-│ MOSI        │◄──│ GP19            │
-│ MISO        │──►│ GP20            │
-│ Motion      │──►│ GP23 (optional) │
+│ CS          │◄──│ GP22            │
+│ SCK         │◄──│ GP23            │
+│ MOSI        │◄──│ GP24            │
+│ MISO        │──►│ GP25            │
+│ Motion      │──►│ GP28 (optional) │
 │ Reset       │◄──│ 3.3V + 10kΩ res │
 └─────────────┘   └─────────────────┘
 ```
@@ -265,10 +262,10 @@ PMW3360 Module     Raspberry Pi Pico
 ```
 Encoder            Raspberry Pi Pico
 ┌─────────────┐   ┌─────────────────┐
-│ A Phase     │◄──│ GP21            │
-│ B Phase     │◄──│ GP22            │
+│ A Phase     │◄──│ GP26            │
+│ B Phase     │◄──│ GP27            │
 │ Common      │◄──│ GND             │
-│ Switch      │◄──│ GP24 (optional) │
+│ Switch      │◄──│ GP28 (optional) │
 │ Switch GND  │◄──│ GND             │
 └─────────────┘   └─────────────────┘
 ```
@@ -546,71 +543,73 @@ qmk console
 | **Power & Communication** |
 | USB Power | Native USB | - | Master only |
 | TRRS Serial | GP1 | GP1 | Bidirectional |
-| Hand Detection | GP16 → GND | GP16 (float) | Critical! |
-| Status LED | GP25 | - | Optional |
-| **Matrix (Rows) - INDEPENDENT** |
+| Hand Detection | GP21 → GND | GP21 (float) | Critical! |
+| Status LED | GP28 | - | Optional |
+| **Matrix (Rows) - NEW 4×6 LAYOUT** |
 | Row 0 | GP2 | GP2 | **Independent pins** |
 | Row 1 | GP3 | GP3 | **Independent pins** |
 | Row 2 | GP4 | GP4 | **Independent pins** |
-| Row 3 | GP5 | GP5 | **Independent pins** |
-| Row 4 | GP6 | GP6 | **Independent pins** |
-| Row 5 | GP7 | GP7 | **Independent pins** |
-| Row 6 (Thumbs) | GP8 | GP8 | **Independent pins** |
-| **Matrix (Columns) - INDEPENDENT** |
-| Column 0 | GP9 | GP12 | **Fully independent** |
-| Column 1 | GP10 | GP13 | **Fully independent** |
-| Column 2 | GP11 | GP14 | **Fully independent** |
+| Row 3 (Thumbs) | GP5 | GP5 | **Independent pins** |
+| **Matrix (Columns) - NEW 4×6 LAYOUT** |
+| Column 0 | GP9 | GP15 | **Fully independent** |
+| Column 1 | GP10 | GP16 | **Fully independent** |
+| Column 2 | GP11 | GP17 | **Fully independent** |
+| Column 3 | GP12 | GP18 | **Fully independent** |
+| Column 4 | GP13 | GP19 | **Fully independent** |
+| Column 5 | GP14 | GP20 | **Fully independent** |
 | **Trackball (SPI)** |
-| CS (Chip Select) | - | GP17 | SPI control |
-| SCK (Serial Clock) | - | GP18 | SPI clock |
-| MOSI (Data Out) | - | GP19 | SPI data → sensor |
-| MISO (Data In) | - | GP20 | SPI data ← sensor |
-| Motion Interrupt | - | GP23 | Optional |
+| CS (Chip Select) | - | GP22 | SPI control |
+| SCK (Serial Clock) | - | GP23 | SPI clock |
+| MOSI (Data Out) | - | GP24 | SPI data → sensor |
+| MISO (Data In) | - | GP25 | SPI data ← sensor |
+| Motion Interrupt | - | GP29 | Optional |
 | **Encoder** |
-| A Phase | - | GP21 | Quadrature |
-| B Phase | - | GP22 | Quadrature |
-| Switch | - | GP24 | Optional push |
+| A Phase | - | GP26 | Quadrature |
+| B Phase | - | GP27 | Quadrature |
+| Switch | - | GP28 | Optional push |
 
 ### Firmware Configuration Cross-Reference
 
 **Config.h Verification:**
 ```c
-// Matrix configuration - INDEPENDENT HALVES
-#define MATRIX_ROWS 7
-#define MATRIX_COLS 3  // Only 3 columns per half
+// Matrix configuration - NEW 4x6 LAYOUT
+#define MATRIX_ROWS 4
+#define MATRIX_COLS 6
 
-#define MATRIX_ROW_PINS { GP2, GP3, GP4, GP5, GP6, GP7, GP8 }
-#define MATRIX_COL_PINS { GP9, GP10, GP11 }  // Left half pins only
+#define MATRIX_ROW_PINS { GP2, GP3, GP4, GP5 }
+#define MATRIX_COL_PINS { GP15, GP16, GP17, GP9, GP10, GP11 }
 #define DIODE_DIRECTION COL2ROW
 
 // Split configuration  
-#define SPLIT_HAND_PIN GP16
-#define SPLIT_HAND_PIN_LOW_IS_LEFT  // GP16→GND = Left
+#define SPLIT_HAND_PIN GP21
+#define SPLIT_HAND_PIN_LOW_IS_LEFT  // GP21→GND = Left
 #define SOFT_SERIAL_PIN GP1
 
 // PMW3360 configuration (right half only)
-#define PMW3360_CS_PIN GP17
-#define SPI_SCK_PIN GP18
-#define SPI_MOSI_PIN GP19  
-#define SPI_MISO_PIN GP20
+#define PMW33XX_CS_PIN GP22
+#define SPI_SCK_PIN GP23
+#define SPI_MOSI_PIN GP24  
+#define SPI_MISO_PIN GP25
 
 // Encoder configuration (right half only)
-#define ENCODERS_PAD_A { GP21 }
-#define ENCODERS_PAD_B { GP22 }
+#define ENCODERS_PAD_A { GP26 }
+#define ENCODERS_PAD_B { GP27 }
 ```
 
 **Matrix.c Logic:**
 ```c
-// Each half scans its own independent 3x7 matrix
-// No column offset logic needed - fully independent
+// Each half scans its own 4x6 matrix
+// New layout: 3 main rows + 1 thumb row
+// Thumb clusters: Left (cols 3,4,5), Right (cols 0,1,2)
 for (uint8_t col = 0; col < MATRIX_COLS; col++) {
-    // Scan all 3 columns on this half only
+    // Scan all 6 columns on this half
 }
 ```
 
 **Key Changes:**
-- **MATRIX_COLS = 3** (not 6) - each half is independent
-- **No shared pins** - each half manages its own matrix completely
+- **MATRIX_ROWS = 4** (3 main + 1 thumb row)
+- **MATRIX_COLS = 6** (6 columns per half)
+- **New thumb cluster arrangement** - asymmetric placement
 - **Simplified scanning** - no column offset logic needed
 if (isLeftHand) {
     col_start = 0;
