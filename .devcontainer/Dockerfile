@@ -2,8 +2,8 @@
 # Copyright 2024 RattusBoard Project  
 # SPDX-License-Identifier: GPL-3.0-or-later
 #
-# Optimized Dockerfile for GitHub Codespaces with Renode simulation
-# Includes QMK build tools, ARM toolchain, and Renode for RP2040 simulation
+# Optimized Dockerfile for GitHub Codespaces with QMK firmware development
+# Includes QMK build tools and ARM toolchain for RP2040
 
 FROM ubuntu:22.04
 
@@ -35,9 +35,6 @@ RUN apt-get update && apt-get install -y \
     dfu-util \
     dfu-programmer \
     avrdude \
-    # .NET dependencies for Renode
-    software-properties-common \
-    gpg-agent \
     # Development utilities for Codespaces
     nano \
     vim \
@@ -46,23 +43,6 @@ RUN apt-get update && apt-get install -y \
     tree \
     htop \
     && rm -rf /var/lib/apt/lists/*
-
-# Install .NET 6.0 (required for Renode)
-RUN wget https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb -O packages-microsoft-prod.deb \
-    && dpkg -i packages-microsoft-prod.deb \
-    && rm packages-microsoft-prod.deb \
-    && apt-get update \
-    && apt-get install -y dotnet-sdk-6.0 \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install Renode
-ENV RENODE_VERSION=1.14.0
-RUN wget https://github.com/renode/renode/releases/download/v${RENODE_VERSION}/renode-${RENODE_VERSION}.linux-portable.tar.gz \
-    && tar -xzf renode-${RENODE_VERSION}.linux-portable.tar.gz \
-    && mv renode_${RENODE_VERSION}_portable /opt/renode \
-    && rm renode-${RENODE_VERSION}.linux-portable.tar.gz \
-    && ln -s /opt/renode/renode /usr/local/bin/renode \
-    && ln -s /opt/renode/renode-test /usr/local/bin/renode-test
 
 # Create developer user for Codespaces compatibility
 ARG USERNAME=developer
@@ -97,7 +77,11 @@ RUN mkdir -p /home/$USERNAME/.local/share/qmk
 # Set environment variables
 ENV PATH="/home/$USERNAME/.local/bin:$PATH"
 
-# Switch back to root for final setup
+# Set working directory to workspace
+WORKDIR /workspace
+
+# Default command
+CMD ["/bin/bash"]
 USER root
 
 # Install RP2040 specific tools

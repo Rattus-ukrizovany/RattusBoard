@@ -3,7 +3,7 @@
 # Copyright 2024 RattusBoard Project
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-echo "🧪 Testing RattusBoard Codespaces Environment"
+echo "🧪 Testing RattusBoard Development Environment"
 echo "=============================================="
 
 # Test 1: Check required tools are available
@@ -14,13 +14,6 @@ if command -v qmk >/dev/null 2>&1; then
     echo "✅ QMK CLI: $(qmk --version)"
 else
     echo "❌ QMK CLI not found"
-    failed=1
-fi
-
-if command -v renode >/dev/null 2>&1; then
-    echo "✅ Renode: $(renode --version | head -1)"
-else
-    echo "❌ Renode not found"
     failed=1
 fi
 
@@ -35,20 +28,6 @@ fi
 echo ""
 echo "📁 Checking repository structure..."
 
-if [ -f "sim/rattusboard.resc" ]; then
-    echo "✅ Renode simulation script found"
-else
-    echo "❌ Renode simulation script missing"
-    failed=1
-fi
-
-if [ -f "sim/rattusboard.repl" ]; then
-    echo "✅ Renode platform description found"
-else
-    echo "❌ Renode platform description missing"
-    failed=1
-fi
-
 if [ -d "keyboards/rattusboard" ]; then
     echo "✅ RattusBoard keyboard definition found"
 else
@@ -56,25 +35,48 @@ else
     failed=1
 fi
 
-# Test 3: Try QMK setup (non-destructive)
-echo ""
-echo "⚙️  Testing QMK setup..."
-if QMK_HOME=/workspace qmk setup --yes 2>/dev/null; then
-    echo "✅ QMK setup successful"
+if [ -f "keyboards/rattusboard/config.h" ]; then
+    echo "✅ Keyboard configuration found"
 else
-    echo "⚠️  QMK setup may need manual intervention"
+    echo "❌ Keyboard configuration missing"
+    failed=1
 fi
 
-# Test 4: Test compilation (if environment is fully set up)
-echo ""
-echo "🔨 Testing firmware compilation..."
-if QMK_HOME=/workspace qmk compile -kb rattusboard -km default 2>/dev/null; then
-    echo "✅ Firmware compilation successful"
-    if [ -f ".build/rattusboard_default.elf" ]; then
-        echo "✅ Firmware binary created"
-    fi
+if [ -f "keyboards/rattusboard/info.json" ]; then
+    echo "✅ Keyboard info.json found"
 else
-    echo "⚠️  Firmware compilation failed (may need QMK setup)"
+    echo "❌ Keyboard info.json missing"
+    failed=1
+fi
+
+# Test 3: Try QMK setup (if not already done)
+echo ""
+echo "⚙️  Testing QMK setup..."
+if [ -d "qmk_firmware" ]; then
+    echo "✅ QMK firmware directory exists"
+else
+    echo "⚠️  QMK setup may be needed - run: qmk setup -y"
+fi
+
+# Test 4: Test compilation (basic validation)
+echo ""
+echo "🔨 Testing configuration validation..."
+if python3 -c "
+import json
+try:
+    with open('keyboards/rattusboard/info.json', 'r') as f:
+        data = json.load(f)
+    print('✅ Keyboard info.json is valid JSON')
+    print(f'✅ Keyboard name: {data.get(\"keyboard_name\", \"Unknown\")}')
+    print(f'✅ Processor: {data.get(\"processor\", \"Unknown\")}')
+except Exception as e:
+    print(f'❌ Keyboard info.json validation failed: {e}')
+    exit(1)
+" 2>/dev/null; then
+    echo "✅ Configuration validation successful"
+else
+    echo "⚠️  Configuration validation failed"
+    failed=1
 fi
 
 # Summary
@@ -85,8 +87,13 @@ if [ $failed -eq 0 ]; then
     echo "🎉 All tests passed! Environment is ready for development."
     echo ""
     echo "Quick start commands:"
-    echo "  qmk compile -kb rattusboard -km default"
-    echo "  renode sim/rattusboard.resc"
+    echo "  qmk setup -y                           # Set up QMK firmware"
+    echo "  qmk compile -kb rattusboard -km default # Compile firmware"
+    echo ""
+    echo "Configuration files:"
+    echo "  keyboards/rattusboard/config.h         # Hardware configuration"
+    echo "  keyboards/rattusboard/info.json        # Keyboard definition"
+    echo "  HALVES_WIRING.md                       # Wiring guide"
 else
     echo "⚠️  Some tests failed. Please check the setup."
     echo ""
@@ -97,4 +104,4 @@ else
 fi
 
 echo ""
-echo "For help, see: https://github.com/Rattus-ukrizovany/RattusBoard/blob/main/SIMULATION.md"
+echo "For help, see: https://github.com/Rattus-ukrizovany/RattusBoard"

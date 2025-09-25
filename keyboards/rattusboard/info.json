@@ -5,6 +5,10 @@
   "maintainer": "Rattus-ukrizovany",
   "processor": "RP2040",
   "bootloader": "rp2040",
+  "usb": {
+    "vid": "0xFEED",
+    "pid": "0x6060"
+  },
   "diode_direction": "COL2ROW",
   "debounce": 5,
   "matrix_pins": {
@@ -24,9 +28,12 @@
     ]
   },
   "features": {
+    "bootmagic": true,
+    "extrakey": true,
+    "mousekey": true,
+    "nkro": true,
     "pointing_device": true,
-    "encoder": true,
-    "split": true
+    "encoder": true
   },
   "layouts": {
     "LAYOUT_split_3x6_3": {
@@ -82,9 +89,5 @@
         {"matrix": [7, 2], "x": 10, "y": 3.25}
       ]
     }
-  },
-  "usb": {
-    "vid": "0xFEED",
-    "pid": "0x6060"
   }
 }

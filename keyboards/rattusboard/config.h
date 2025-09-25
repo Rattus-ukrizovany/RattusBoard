@@ -4,7 +4,7 @@
 #pragma once
 
 /* key matrix size - unified 4x6 matrix per half */
-#define MATRIX_ROWS 4
+#define MATRIX_ROWS 8
 #define MATRIX_COLS 6
 
 /* 
