@@ -6,7 +6,7 @@
 
 ## 📋 Matrix Layout Overview
 
-- **Main grid:** 3 rows × 5 columns per half (top 15 keys)
+- **Main grid:** 3 rows × 6 columns per half (top 18 keys)
 - **Thumb row:** 1 row × 3 columns per half (bottom, angled thumb cluster)
 - **Columns:** Numbered left to right from user perspective
 - **Thumb keys:** are a separate row—“thumb row”—below the grid, not part of row 0 of the main grid
@@ -20,41 +20,44 @@
 ```
 USER
 ↑
-┌─────┬─────┬─────┬─────┬─────┐   ← Main Row 2 (top)
-│  M2 │  M2 │  M2 │  M2 │  M2 │
-├─────┼─────┼─────┼─────┼─────┤
-│  M1 │  M1 │  M1 │  M1 │  M1 │
-├─────┼─────┼─────┼─────┼─────┤
-│  M0 │  M0 │  M0 │  M0 │  M0 │
-└─────┴─────┴─────┴─────┴─────┘
-               T0    T1    T2                  ← Thumb row (bottom, angled)
+┌─────┬─────┬─────┬─────┬─────┬─────┐   ← Main Row 2 (top)
+│M2C0 │M2C1 │M2C2 │M2C3 │M2C4 │M2C5 │
+├─────┼─────┼─────┼─────┼─────┼─────┤
+│M1C0 │M1C1 │M1C2 │M1C3 │M1C4 │M1C5 │
+├─────┼─────┼─────┼─────┼─────┼─────┤
+│M0C0 │M0C1 │M0C2 │M0C3 │M0C4 │M0C5 │
+└─────┴─────┴─────┴─────┴─────┴─────┘
+                     T0    T1    T2                       ← Thumb row (angled, bottom)
 ```
-- M = main grid rows (M2 = top, M1 = middle, M0 = bottom); T = thumb keys
+- M = main grid rows (M2 = top, M1 = mid, M0 = bottom); C = column
+- T = thumb keys (Ctrl/Esc, Enter, Shift in image4)
 
 **Pin assignments:**
 - **Rows:**  
   - GP2: Main Row 0 (bottom of grid)  
   - GP3: Main Row 1 (middle of grid)  
   - GP4: Main Row 2 (top of grid)  
-  - GP5: Thumb row (all 3 thumb keys)
+  - GP5: Thumb row (all 3 thumb keys, row 3)
 - **Columns:**  
   - GP9  → Column 0 (leftmost)  
   - GP10 → Column 1  
   - GP11 → Column 2  
   - GP12 → Column 3  
-  - GP13 → Column 4 (rightmost)
+  - GP13 → Column 4  
+  - GP14 → Column 5 (rightmost)
 
-| Pin   | Function   | Description                     |
-|-------|------------|---------------------------------|
-| GP2   | Main Row 0 | Bottom main grid row            |
-| GP3   | Main Row 1 | Middle main grid row            |
-| GP4   | Main Row 2 | Top main grid row               |
-| GP5   | Thumb Row  | All thumb keys (T0, T1, T2)     |
-| GP9   | Col 0      | Leftmost column                 |
-| GP10  | Col 1      | Second column                   |
-| GP11  | Col 2      | Middle column                   |
-| GP12  | Col 3      | Fourth column                   |
-| GP13  | Col 4      | Rightmost column                |
+| Pin   | Function   | Description                       |
+|-------|------------|-----------------------------------|
+| GP2   | Main Row 0 | Bottom main grid row              |
+| GP3   | Main Row 1 | Middle main grid row              |
+| GP4   | Main Row 2 | Top main grid row                 |
+| GP5   | Thumb Row  | All thumb keys (T0, T1, T2)       |
+| GP9   | Col 0      | Leftmost column                   |
+| GP10  | Col 1      | Column 1                          |
+| GP11  | Col 2      | Column 2                          |
+| GP12  | Col 3      | Column 3                          |
+| GP13  | Col 4      | Column 4                          |
+| GP14  | Col 5      | Rightmost column                  |
 
 **Other connections:**
 - GP1  → TRRS Tip (Serial to right half)
@@ -71,14 +74,14 @@ USER
 ```
 USER
 ↑
-┌─────┬─────┬─────┬─────┬─────┐   ← Main Row 2 (top)
-│  M2 │  M2 │  M2 │  M2 │  M2 │
-├─────┼─────┼─────┼─────┼─────┤
-│  M1 │  M1 │  M1 │  M1 │  M1 │
-├─────┼─────┼─────┼─────┼─────┤
-│  M0 │  M0 │  M0 │  M0 │  M0 │
-└─────┴─────┴─────┴─────┴─────┘
-   T0    T1    T2                  ← Thumb row (bottom, angled)
+┌─────┬─────┬─────┬─────┬─────┬─────┐   ← Main Row 2 (top)
+│M2C0 │M2C1 │M2C2 │M2C3 │M2C4 │M2C5 │
+├─────┼─────┼─────┼─────┼─────┼─────┤
+│M1C0 │M1C1 │M1C2 │M1C3 │M1C4 │M1C5 │
+├─────┼─────┼─────┼─────┼─────┼─────┤
+│M0C0 │M0C1 │M0C2 │M0C3 │M0C4 │M0C5 │
+└─────┴─────┴─────┴─────┴─────┴─────┘
+  T0    T1    T2                       ← Thumb row (angled, bottom)
 ```
 - M = main grid rows; T = thumb keys (Tab, Bksp, Space in image4)
 
@@ -87,25 +90,27 @@ USER
   - GP2: Main Row 0 (bottom of grid)  
   - GP3: Main Row 1 (middle of grid)  
   - GP4: Main Row 2 (top of grid)  
-  - GP5: Thumb row (all 3 thumb keys)
+  - GP5: Thumb row (all 3 thumb keys, row 3)
 - **Columns:**  
-  - GP15 → Column 0 (leftmost)  
-  - GP16 → Column 1  
-  - GP17 → Column 2  
-  - GP18 → Column 3  
-  - GP19 → Column 4 (rightmost)
+  - GP15 → Column 0 (leftmost)
+  - GP16 → Column 1
+  - GP17 → Column 2
+  - GP18 → Column 3
+  - GP19 → Column 4
+  - GP20 → Column 5 (rightmost)
 
-| Pin   | Function   | Description                     |
-|-------|------------|---------------------------------|
-| GP2   | Main Row 0 | Bottom main grid row            |
-| GP3   | Main Row 1 | Middle main grid row            |
-| GP4   | Main Row 2 | Top main grid row               |
-| GP5   | Thumb Row  | All thumb keys (T0, T1, T2)     |
-| GP15  | Col 0      | Leftmost column                 |
-| GP16  | Col 1      | Second column                   |
-| GP17  | Col 2      | Middle column                   |
-| GP18  | Col 3      | Fourth column                   |
-| GP19  | Col 4      | Rightmost column                |
+| Pin   | Function   | Description                       |
+|-------|------------|-----------------------------------|
+| GP2   | Main Row 0 | Bottom main grid row              |
+| GP3   | Main Row 1 | Middle main grid row              |
+| GP4   | Main Row 2 | Top main grid row                 |
+| GP5   | Thumb Row  | All thumb keys (T0, T1, T2)       |
+| GP15  | Col 0      | Leftmost column                   |
+| GP16  | Col 1      | Column 1                          |
+| GP17  | Col 2      | Column 2                          |
+| GP18  | Col 3      | Column 3                          |
+| GP19  | Col 4      | Column 4                          |
+| GP20  | Col 5      | Rightmost column                  |
 
 **Other connections:**
 - GP1  → TRRS Tip (Serial from left half)
@@ -141,4 +146,4 @@ USER
 
 ---
 
-*See README.md for firmware configuration. Layout and pinouts match [image4](image4): thumb (purple/angled) row is separate and at the bottom, not part of the main grid!*
+*See README.md for firmware configuration. Layout and pinouts match [image4](image4): thumb (angled) row is separate and at the bottom, not part of the main grid!*
