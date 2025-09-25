@@ -21,7 +21,7 @@
 
 ### 👤 **New Users**
 Just want to build and use?
-- 📥 **[Download Latest Firmware](https://github.com/Rattus-ukrizovany/RattusBoard/releases/latest/download/rattusboard_default.uf2)**
+- 📥 **[Download Latest Firmware](https://github.com/Rattus-ukrizovany/RattusBoard/releases/latest/download/rattusboard_vial.uf2)**
 - 🔧 **[Flash Instructions](#-firmware-flashing--split-setup)**
 - 🏗️ **[Build Guide](HALVES_WIRING.md)**
 
@@ -206,11 +206,11 @@ graph LR
 
 #### 📥 **Step 1: Download**
 1. Go to **[Latest Release](https://github.com/Rattus-ukrizovany/RattusBoard/releases/latest)**
-2. Download **`rattusboard_default.uf2`**
+2. Download **`rattusboard_vial.uf2`**
 
 #### 🔧 **Step 2: Flash Both Halves**
 1. Hold **BOOTSEL** + plug USB (Pico enters bootloader)
-2. Drag **`rattusboard_default.uf2`** to **RPI-RP2** drive
+2. Drag **`rattusboard_vial.uf2`** to **RPI-RP2** drive
 3. Repeat for **both Picos** with the **same file**
 
 </td>
@@ -377,7 +377,7 @@ qmk compile -kb rattusboard -km vial
 
 ### 📥 **Latest Release**
 
-**[Download rattusboard_default.uf2](https://github.com/Rattus-ukrizovany/RattusBoard/releases/latest/download/rattusboard_default.uf2)**
+**[Download rattusboard_vial.uf2](https://github.com/Rattus-ukrizovany/RattusBoard/releases/latest/download/rattusboard_vial.uf2)**
 
 *VIAL-enabled firmware with all features — works for both halves!*
 
@@ -489,7 +489,7 @@ qmk compile -kb rattusboard -km vial
 <tr>
 <td>🎹 <strong>Vial not detecting</strong></td>
 <td>
-• Ensure you flashed <code>rattusboard_default.uf2</code> (VIAL-enabled)<br>
+• Ensure you flashed <code>rattusboard_vial.uf2</code> (VIAL-enabled)<br>
 • Restart Vial application<br>
 • Try a different USB port<br>
 • Check Windows drivers (may need Zadig)
