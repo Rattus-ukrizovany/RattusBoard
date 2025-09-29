@@ -182,7 +182,7 @@ Building from source?
 <td width="50%">
 
 #### 📁 **Available Files**
-- **STEP Models** — Precision CAD format for modification
+- **PNG Previews** — Visual reference images (above)
 - **STL Files** — Ready for 3D printing
 - **Multiple Components** — Cases, plates, holders
 
@@ -201,7 +201,7 @@ Building from source?
 </tr>
 </table>
 
-> 🎯 **For Makers:** STEP files allow full customization of cases, plates, and mounting solutions. Perfect for creating custom enclosures or adapting for different switch types.
+> 🎯 **For Makers:** STL files are ready for 3D printing with standard slicing software. PNG previews show the assembled appearance with cases, plates, and holders positioned correctly.
 
 ---
 
