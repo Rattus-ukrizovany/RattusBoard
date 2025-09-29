@@ -134,6 +134,77 @@ Building from source?
 
 ---
 
+## 📐 STEP Models & Visual Reference
+
+<div align="center">
+
+### 🔍 **3D Model Preview**
+
+*Visual reference for assembly and case design*
+
+</div>
+
+<table>
+<tr>
+<td width="50%" align="center">
+
+### 🫲 **Left Half**
+
+<img src="models/left.png" alt="RattusBoard Left Half STEP Model" width="400"/>
+
+**Master Half Features:**
+- USB-C connection port
+- Hand detection (GP21 → GND)
+- 4×6 key matrix
+- TRRS jack for split communication
+
+</td>
+<td width="50%" align="center">
+
+### 🫱 **Right Half**
+
+<img src="models/right.png" alt="RattusBoard Right Half STEP Model" width="400"/>
+
+**Slave Half Features:**
+- PMW3360 trackball sensor
+- Rotary encoder
+- Hand detection (GP21 → float)
+- 4×6 key matrix
+
+</td>
+</tr>
+</table>
+
+### 📋 **Model Information**
+
+<table>
+<tr>
+<td width="50%">
+
+#### 📁 **Available Files**
+- **STEP Models** — Precision CAD format for modification
+- **STL Files** — Ready for 3D printing
+- **Multiple Components** — Cases, plates, holders
+
+**[Browse All Models →](Models/)**
+
+</td>
+<td width="50%">
+
+#### 💡 **Usage Notes**
+- **Right Bottom = Right Half** — Trackball and encoder side
+- **Left Bottom = Left Half** — Master/USB connection side
+- **Symmetric Design** — Both halves mirror each other
+- **Modular Components** — Cases and plates separate
+
+</td>
+</tr>
+</table>
+
+> 🎯 **For Makers:** STEP files allow full customization of cases, plates, and mounting solutions. Perfect for creating custom enclosures or adapting for different switch types.
+
+---
+
 ## 🛠️ Build Guide
 
 <div align="center">
