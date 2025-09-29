@@ -9,6 +9,25 @@
 [![License](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](LICENSE)
 [![Build Status](https://github.com/Rattus-ukrizovany/RattusBoard/workflows/Build%20RattusBoard%20Firmware/badge.svg)](https://github.com/Rattus-ukrizovany/RattusBoard/actions)
 
+### 📸 **Showcase**
+
+<table>
+<tr>
+<td width="50%" align="center">
+
+**Left Half**
+<img src="left.png" alt="RattusBoard Left Half" width="100%">
+
+</td>
+<td width="50%" align="center">
+
+**Right Half**
+<img src="right.png" alt="RattusBoard Right Half" width="100%">
+
+</td>
+</tr>
+</table>
+
 </div>
 
 ---
