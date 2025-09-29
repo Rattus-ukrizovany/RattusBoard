@@ -86,17 +86,30 @@ Building from source?
 </tr>
 </table>
 
----
-
-## 🖼️ Model Previews
+### 🖼️ **Model Overview**
 
 <div align="center">
 
-**Right Half:**  
-![image1](image1)
+<table>
+<tr>
+<td width="50%" align="center">
 
-**Left Half:**  
-![image2](image2)
+**Right Half**  
+<img src="image1" alt="RattusBoard Right Half Model" width="300"/>
+
+*Features trackball and rotary encoder*
+
+</td>
+<td width="50%" align="center">
+
+**Left Half**  
+<img src="image2" alt="RattusBoard Left Half Model" width="300"/>
+
+*Master half with USB-C connection*
+
+</td>
+</tr>
+</table>
 
 </div>
 
